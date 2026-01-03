@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
+use App\Mail\SendOtp;
 use App\Models\LookingFor;
 use App\Models\Profile;
 use App\Models\User;
@@ -12,6 +13,7 @@ use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
@@ -19,7 +21,82 @@ class AuthenticationController extends Controller
 {
     use ApiResponse;
 
-    public function register(RegisterUserRequest $request)
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'display_name' => ['required', 'string', 'max:255'],
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'location' => ['required', 'string'],
+        ]);
+
+        // Create user
+        $user = User::create([
+            'display_name' => $validated['display_name'],
+            'fname' => $validated['fname'],
+            'lname' => $validated['lname'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        // Create profile
+        $profile = Profile::create([
+            'user_id' => $user->id,
+            'location' => $validated['location'] ?? null,
+        ]);
+
+        $lookingFor = LookingFor::create([
+            'user_id' => $user->id,
+        ]);
+
+        $otp = mt_rand(100000, 999999);
+
+        $user->otp = $otp;
+        $user->save();
+
+        Mail::to($user->email)->send(new SendOtp($otp));
+
+        $user = array_merge(
+            $user->toArray(),
+            $profile->toArray(),
+            $lookingFor->toArray(),
+            ['otp' => $otp]
+        );
+
+        return $this->successResponse(
+            $user,
+            'Registration successful',
+        );
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
+            'otp' => ['required', 'numeric'],
+        ]);
+
+        $user = User::where('email', $validated['email'])->where('otp', $validated['otp'])->first();
+
+        if (! $user) {
+            return $this->errorResponse('Invalid OTP', 401);
+        }
+
+        $user->otp = null;
+        $user->email_verified_at = now();
+        $user->save();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return $this->successResponse(
+            $token,
+            'Registration successful',
+        );
+    }
+
+    public function profile(RegisterUserRequest $request)
     {
         $validated = $request->validated();
 
@@ -28,30 +105,28 @@ class AuthenticationController extends Controller
             $file = FileUpload::storeFile($request->file('photo'), 'uploads/users');
         }
 
-        // Create user
-        $user = User::create([
-            'display_name' => $validated['display_name'],
-            'fname' => $validated['fname'],
-            'lname' => $validated['lname'],
-            'dob' => $validated['dob'],
-            'age' => $validated['age'],
-            'photo' => $file,
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'is_accept' => $validated['is_accept'],
-            'is_permission' => $validated['is_permission'],
-        ]);
+        $user = Auth::user();
+
+        if (!$user) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        $user->dob = $validated['dob'];
+        $user->age = $validated['age'];
+        $user->photo = $file;
+        $user->is_accept = $validated['is_accept'];
+        $user->is_permission = $validated['is_permission'];
+        $user->save();
 
         // Create profile
-        $profile = Profile::create([
-            'user_id' => $user->id,
+        $profile = Profile::where('user_id', $user->id)->first();
+        $profile->update([
             'gender' => $validated['gender'] ?? null,
             'origin' => $validated['origin'] ?? null,
             'looking_for' => $validated['looking_for'] ?? null,
             'relationship' => $validated['relationship'] ?? null,
             'children' => $validated['children'] ?? null,
             'religion' => $validated['religion'] ?? null,
-            'location' => $validated['location'] ?? null,
             'hair_color' => $validated['hair_color'] ?? null,
             'eye_color' => $validated['eye_color'] ?? null,
             'body_type' => $validated['body_type'] ?? null,
@@ -79,8 +154,8 @@ class AuthenticationController extends Controller
         ]);
 
         // Create LookingFor
-        $lookingFor = LookingFor::create([
-            'user_id' => $user->id,
+        $lookingFor = LookingFor::where('user_id', $user->id)->first();
+        $lookingFor->update([
             'gender' => $validated['gender'] ?? null,
             'origin' => $validated['origin'] ?? null,
             'relationship' => $validated['relationship'] ?? null,
@@ -138,7 +213,7 @@ class AuthenticationController extends Controller
 
         $data = [
             'token' => $token,
-            'user' => $user
+            'user' => $user,
         ];
 
         return $this->successResponse(

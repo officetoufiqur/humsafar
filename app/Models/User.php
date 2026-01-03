@@ -28,6 +28,7 @@ class User extends Authenticatable
         'photo',
         'email',
         'password',
+        'otp',
         'is_accept',
         'is_permission',
         'is_online',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
@@ -14,26 +15,35 @@ Route::get('/user', function (Request $request) {
 
 
 Route::controller(AuthenticationController::class)->group(function () {
-    Route::post('login', 'login');
-    Route::post('register', 'register');
+    Route::post('/login', 'login');
+    Route::post('/register', 'register');
+    Route::post('/verify-otp', 'verifyOtp');
 });
-// Route::middleware('auth:sanctum')->group(function () {
-// });
+
+Route::controller(AdminAuthenticationController::class)->group(function () {
+    Route::post('/admin/login', 'adminLogin');
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/profile', [AuthenticationController::class, 'profile']);
+});
 
 Route::controller(StaffController::class)->group(function () {
-    Route::post('staff', 'staff');
+    Route::post('/staff', 'staff');
 });
 
 Route::controller(BannerController::class)->group(function () {
-    Route::post('news-letters', 'newsLetters');
+    Route::post('/news-letters', 'newsLetters');
 });
 
 Route::controller(PackageController::class)->group(function () {
-    Route::post('packages', 'packages');
+    Route::post('/packages', 'packages');
 });
 
 Route::controller(BlogController::class)->group(function () {
-    Route::post('category', 'category');
-    Route::post('blogs', 'blogs');
-    Route::get('blogs', 'getBlogs');
+    Route::post('/blog-category', 'category');
+    Route::post('/blogs', 'blogs');
+    Route::get('/blogs', 'getBlogs');
+    Route::get('/blog-statistics', 'statistics');
+    Route::get('/blog-category', 'gatCategory');
 });

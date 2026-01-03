@@ -11,6 +11,7 @@ class Blog extends Model
 
     protected $fillable = [
         'seo_id',
+        'category_id',
         'title',
         'category',
         'slug',
@@ -23,5 +24,10 @@ class Blog extends Model
     public function seo()
     {
         return $this->belongsTo(Seo::class);
+    }
+
+    public function category()
+    {
+       return $this->belongsTo(BlogCategory::class, 'category_id');
     }
 }

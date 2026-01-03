@@ -23,13 +23,8 @@ class RegisterUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'display_name' => 'required|string|max:255',
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
             'dob' => 'required|date',
             'age' => 'required|integer',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
             'is_accept' => 'required|boolean',
             'is_permission' => 'required|boolean',
             'gender' => ['required', Rule::in(['male','female','other'])],
@@ -38,7 +33,6 @@ class RegisterUserRequest extends FormRequest
             'relationship' => 'required|string',
             'children' => 'required|integer',
             'religion' => 'required|string',
-            'location' => 'required|string',
             'hair_color' => 'required|string',
             'eye_color' => 'required|string',
             'body_type' => 'required|string',

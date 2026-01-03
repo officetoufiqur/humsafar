@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->string('email');
             $table->string('password');
+            $table->string('otp')->nullable();
             $table->boolean('is_accept')->default(0);
             $table->boolean('is_permission')->default(0);
             $table->timestamp('is_online')->nullable();

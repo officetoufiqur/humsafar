@@ -13,6 +13,17 @@ class BlogController extends Controller
 {
     use ApiResponse;
 
+    public function gatCategory()
+    {
+        $categories = BlogCategory::withCount('blogs')->get();
+
+        if (!$categories) {
+            return $this->errorResponse('Category not found', 404);
+        }
+
+        return $this->successResponse($categories, 'Category fetched successfully');
+    }
+
     public function category(Request $request)
     {
         $request->validate([
@@ -36,13 +47,27 @@ class BlogController extends Controller
         return $this->successResponse($blog, 'Blogs fetched successfully');
     }
 
+    public function statistics()
+    {
+        $blog = Blog::count();
+        $active = Blog::where('status', true)->count();
+        $inactive = Blog::where('status', false)->count();
+
+        $data = [
+            'total' => $blog,
+            'active' => $active,
+            'inactive' => $inactive,
+        ];
+        return $this->successResponse($data, 'Blogs fetched successfully');
+    }
+
     public function blogs(Request $request)
     {
         $request->validate([
            'title' => 'required|string|max:255',
-           'category' => 'required|string|max:255',
            'slug' => 'required|string|max:255',
            'description' => 'required|string',
+           'category_id' => 'required|exists:blog_categories,id',
            'short_description' => 'required|string',
            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
            'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
@@ -65,10 +90,13 @@ class BlogController extends Controller
             $file = FileUpload::storeFile($request->file('image'), 'uploads/blogs');
         }
 
+        $category = BlogCategory::find($request->category_id);
+
         $blog = new Blog();
         $blog->seo_id = $seo->id;
         $blog->title = $request->title;
-        $blog->category = $request->category;
+        $blog->category_id = $category->id;
+        $blog->category = $category->name;
         $blog->slug = $request->slug;
         $blog->description = $request->description;
         $blog->short_description = $request->short_description;
