@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::controller(AdminAuthenticationController::class)->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
+    Route::get('/roles', [RolePermissionController::class, 'roles']);
 });
 
 Route::controller(StaffController::class)->group(function () {
