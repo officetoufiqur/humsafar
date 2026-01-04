@@ -58,11 +58,14 @@ class AuthenticationController extends Controller
 
         Mail::to($user->email)->send(new SendOtp($otp));
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         $user = array_merge(
             $user->toArray(),
             $profile->toArray(),
             $lookingFor->toArray(),
-            ['otp' => $otp]
+            ['otp' => $otp],
+            ['token' => $token],
         );
 
         return $this->successResponse(
@@ -116,6 +119,7 @@ class AuthenticationController extends Controller
         $user->photo = $file;
         $user->is_accept = $validated['is_accept'];
         $user->is_permission = $validated['is_permission'];
+        $user->is_complete = 1;
         $user->save();
 
         // Create profile

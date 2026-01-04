@@ -31,6 +31,7 @@ class User extends Authenticatable
         'password',
         'otp',
         'is_accept',
+        'is_complete',
         'is_permission',
         'is_online',
     ];

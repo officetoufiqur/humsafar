@@ -19,6 +19,10 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
+            FaqCategorySeeder::class,
+            FaqSeeder::class,
+            WorkSeeder::class,
+            WorkStepSeeder::class,
         ]);
     }
 }

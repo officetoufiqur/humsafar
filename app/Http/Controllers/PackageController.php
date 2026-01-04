@@ -11,6 +11,35 @@ class PackageController extends Controller
 {
     use ApiResponse;
 
+    public function getPackages(Request $request)
+    {
+        $parameter = $request->query('parameter');
+
+        $query = Package::query();
+
+        if ($parameter === 'active') {
+            $query->where('status', true);
+            $message = 'Active packages fetched successfully';
+
+        } elseif ($parameter === 'inactive') {
+            $query->where('status', false);
+            $message = 'Inactive packages fetched successfully';
+
+        } elseif ($parameter !== null) {
+            return $this->errorResponse(
+                'Invalid parameter value',
+                422
+            );
+        } else {
+            $message = 'Packages fetched successfully';
+        }
+
+        return $this->successResponse(
+            $query->get(),
+            $message
+        );
+    }
+
     public function packages(Request $request)
     {
         $request->validate([
