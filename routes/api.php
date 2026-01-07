@@ -7,6 +7,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\WorkController;
@@ -53,6 +54,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(WorkController::class)->group(function () {
         Route::get('/works', 'index');
+    });
+
+    Route::controller(ProfileAttributeController::class)->group(function () {
+        Route::get('/profile-attributes', 'index');
+        Route::post('/profile-attributes/{id}', 'update');
     });
 
 });

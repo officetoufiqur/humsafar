@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             WorkSeeder::class,
             WorkStepSeeder::class,
+            ProfileAttributeSeeder::class,
         ]);
     }
 }
