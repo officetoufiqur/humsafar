@@ -21,20 +21,33 @@ Route::get('/user', function (Request $request) {
 Route::controller(AuthenticationController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/register', 'register');
-    Route::post('/verify-otp', 'verifyOtp');
 });
 
 Route::controller(AdminAuthenticationController::class)->group(function () {
     Route::post('/admin/login', 'adminLogin');
 });
 
+ Route::controller(AuthenticationController::class)->group(function () {
+        Route::post('/verify-otp', 'verifyOtp');
+    });
+    
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
-    Route::get('/roles', [RolePermissionController::class, 'roles']);
+    Route::get('/membership', [AuthenticationController::class, 'membership']);
+
+    Route::controller(RolePermissionController::class)->group(function () {
+        Route::get('/roles', 'roles');
+        Route::post('/roles', 'roleStore');
+        Route::get('/permissions', 'permissions');
+    });
 
     Route::controller(PackageController::class)->group(function () {
-        Route::post('/packages', 'packages');
         Route::get('/packages', 'getPackages');
+        Route::post('/packages', 'packages');
+        Route::get('/packages/{id}', 'packagesEdit');
+        Route::post('/packages/{id}', 'packagesUpdate');
+        Route::post('/packages/status/{id}', 'packagesUpdateStatus');
         // Route::get('/package/statistics', 'packageStatistics');
     });
 
@@ -52,29 +65,44 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/faqs/{id}', 'destroy');
     });
 
-    Route::controller(WorkController::class)->group(function () {
-        Route::get('/works', 'index');
-    });
-
     Route::controller(ProfileAttributeController::class)->group(function () {
         Route::get('/profile-attributes', 'index');
         Route::post('/profile-attributes/{id}', 'update');
     });
 
+    Route::controller(StaffController::class)->group(function () {
+        Route::post('/staff', 'staff');
+    });
+
+    Route::controller(BannerController::class)->group(function () {
+        Route::post('/news-letters', 'newsLetters');
+    });
+
+    Route::controller(BlogController::class)->group(function () {
+        Route::get('/blog-category', 'gatCategory');
+        Route::post('/blog-category', 'category');
+        Route::get('/blog-category/{id}', 'categoryEdit');
+        Route::post('/blog-category/{id}', 'categoryUpdate');
+        Route::delete('/blog-category/{id}', 'categoryDelete');
+        Route::get('/blogs', 'getBlogs');
+        Route::get('/blog-statistics', 'statistics');
+        Route::post('/blogs', 'blogs');
+        Route::get('/blogs/{id}', 'blogsEdit');
+        Route::post('/blogs/{id}', 'blogsUpdate');
+        Route::delete('/blogs/{id}', 'blogDelete');
+    });
+
 });
 
-Route::controller(StaffController::class)->group(function () {
-    Route::post('/staff', 'staff');
+Route::controller(WorkController::class)->group(function () {
+    Route::get('/works', 'index');
 });
 
-Route::controller(BannerController::class)->group(function () {
-    Route::post('/news-letters', 'newsLetters');
-});
-
-Route::controller(BlogController::class)->group(function () {
-    Route::post('/blog-category', 'category');
-    Route::post('/blogs', 'blogs');
-    Route::get('/blogs', 'getBlogs');
-    Route::get('/blog-statistics', 'statistics');
-    Route::get('/blog-category', 'gatCategory');
-});
+ Route::controller(BlogController::class)->group(function () {
+        Route::get('/blog-category', 'gatCategory');
+        Route::get('/blogs', 'getBlogs');
+    });
+    
+ Route::controller(FaqController::class)->group(function () {
+        Route::get('/faqs', 'index');
+    });

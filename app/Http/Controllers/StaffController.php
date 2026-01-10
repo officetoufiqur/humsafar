@@ -38,6 +38,8 @@ class StaffController extends Controller
             'status' => true,
         ]);
 
+        $Staff->syncRoles($request->roles);
+
         return $this->successResponse($Staff, 'Staff created successfully');
     }
 }

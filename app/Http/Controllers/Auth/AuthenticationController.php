@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
 use App\Mail\SendOtp;
 use App\Models\LookingFor;
+use App\Models\Package;
 use App\Models\Profile;
 use App\Models\User;
 use App\Trait\ApiResponse;
@@ -94,8 +95,22 @@ class AuthenticationController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->successResponse(
-            $token,
+            $user,
             'Registration successful',
+        );
+    }
+
+    public function membership()
+    {
+        $package = Package::where('status', 1)->first();
+
+        if (!$package) {
+            return $this->errorResponse('Package not found', 404);
+        }
+
+        return $this->successResponse(
+            $package,
+            'Package fetched successfully',
         );
     }
 
@@ -153,8 +168,7 @@ class AuthenticationController extends Controller
             'smoke' => $validated['smoke'] ?? null,
             'drinking' => $validated['drinking'] ?? null,
             'going_out' => $validated['going_out'] ?? null,
-            'membership_name' => $validated['membership_name'] ?? null,
-            'membership_amount' => $validated['membership_amount'] ?? null,
+            'package_id' => $validated['package_id'] ?? null,
         ]);
 
         // Create LookingFor

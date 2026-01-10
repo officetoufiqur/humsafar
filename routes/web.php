@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -14,6 +15,15 @@ Route::get('/storage-link', function () {
 
     symlink($target, $link);
     return 'Symlink created successfully.';
+});
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+
+    return 'Cache cleared successfully!';
 });
 
 Route::get('/', function () {

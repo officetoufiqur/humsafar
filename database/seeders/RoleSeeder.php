@@ -15,8 +15,8 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::insert([
-            ['name' => 'admin', 'guard_name' => 'web'],
-            ['name' => 'staff', 'guard_name' => 'web']
+            ['name' => 'admin', 'description' => 'Admin', 'guard_name' => 'web'],
+            ['name' => 'staff','description' => 'Staff', 'guard_name' => 'web']
         ]);
 
         $adminRole = Role::where('name', 'admin')->first();

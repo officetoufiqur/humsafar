@@ -22,6 +22,10 @@ class PermissionSeeder extends Seeder
             'blogs.view','blogs.create','blogs.edit','blogs.delete',
             'packages.view','packages.create','packages.edit','packages.delete',
             'complaints.view','complaints.create','complaints.edit','complaints.delete',
+            'reports.view','reports.create','reports.edit','reports.delete',
+            'marketing.view','marketing.create','marketing.edit','marketing.delete',
+            'settings.view','settings.create','settings.edit','settings.delete',
+            'chat_settings.view','chat_settings.create','chat_settings.edit','chat_settings.delete',
         ];
 
         foreach ($permissions as $permission) {

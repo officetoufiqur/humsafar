@@ -22,4 +22,9 @@ class Package extends Model
     protected $casts = [
         'features' => 'array',
     ];
+
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class);
+    }
 }

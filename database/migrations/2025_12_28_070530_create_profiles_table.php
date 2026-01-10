@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
+            $table->foreignId('package_id')->nullable()->constrained('packages')->cascadeOnDelete();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('origin')->nullable();
             $table->string('looking_for')->nullable();
@@ -43,8 +44,6 @@ return new class extends Migration
             $table->enum('smoke', ['no', 'occasionally', 'yes'])->nullable();
             $table->enum('drinking', ['no', 'occasionally', 'yes'])->nullable();
             $table->enum('going_out', ['never', 'sometimes', 'often'])->nullable();
-            $table->string('membership_name')->nullable();
-            $table->decimal('membership_amount', 10, 2)->nullable();
 
             $table->timestamps();
         });
