@@ -71,7 +71,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(StaffController::class)->group(function () {
+        Route::get('/staff', 'index');
         Route::post('/staff', 'staff');
+        Route::get('/staff/{id}', 'staffEdit');
+        Route::post('/staff/{id}', 'staffUpdate');
+        Route::delete('/staff/{id}', 'staffDelete');
     });
 
     Route::controller(BannerController::class)->group(function () {

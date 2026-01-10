@@ -103,7 +103,7 @@ class AuthenticationController extends Controller
 
     public function membership()
     {
-        $package = Package::where('status', 1)->first();
+        $package = Package::where('status', 1)->get();
 
         if (!$package) {
             return $this->errorResponse('Package not found', 404);
