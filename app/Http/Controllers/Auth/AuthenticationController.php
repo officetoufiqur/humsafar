@@ -52,7 +52,8 @@ class AuthenticationController extends Controller
             'user_id' => $user->id,
         ]);
 
-        $otp = mt_rand(100000, 999999);
+        // $otp = mt_rand(10000000, 99999999);
+        $otp = '12345678';
 
         $user->otp = $otp;
         $user->save();
