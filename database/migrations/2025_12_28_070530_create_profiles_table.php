@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
             $table->foreignId('package_id')->nullable()->constrained('packages')->cascadeOnDelete();
-            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->string('gender')->nullable();
+            $table->integer('age')->nullable();
             $table->string('origin')->nullable();
             $table->string('looking_for')->nullable();
             $table->string('relationship')->nullable();
@@ -41,9 +42,9 @@ return new class extends Migration
             $table->json('reading')->nullable();
             $table->json('tv_shows')->nullable();
             $table->json('personal_attitude')->nullable();
-            $table->enum('smoke', ['no', 'occasionally', 'yes'])->nullable();
-            $table->enum('drinking', ['no', 'occasionally', 'yes'])->nullable();
-            $table->enum('going_out', ['never', 'sometimes', 'often'])->nullable();
+            $table->string('smoke')->nullable();
+            $table->string('drinking')->nullable();
+            $table->string('going_out')->nullable();
 
             $table->timestamps();
         });

@@ -6,6 +6,8 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\RolePermissionController;
@@ -37,8 +39,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/membership', [AuthenticationController::class, 'membership']);
 
     Route::controller(RolePermissionController::class)->group(function () {
+        Route::get('/roles-permissions', 'index');
         Route::get('/roles', 'roles');
         Route::post('/roles', 'roleStore');
+        Route::get('/roles/{id}', 'roleEdit');
+        Route::post('/roles/{id}', 'roleUpdate');
         Route::get('/permissions', 'permissions');
     });
 
@@ -94,6 +99,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/blogs/{id}', 'blogsEdit');
         Route::post('/blogs/{id}', 'blogsUpdate');
         Route::delete('/blogs/{id}', 'blogDelete');
+    });
+
+    Route::controller(MatchController::class)->group(function () {
+        Route::get('/matches', 'index');
+    });
+
+    Route::controller(MyProfileController::class)->group(function () {
+        Route::get('/setting/account', 'index');
+        Route::post('/setting/update/password', 'updatePassword');
+        Route::delete('/setting/delete/account', 'deleteAccount');
+        Route::post('/setting/photo', 'photoSetting');
+        Route::post('/setting/partner', 'partnerSetting');
     });
 
 });

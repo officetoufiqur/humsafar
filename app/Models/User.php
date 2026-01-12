@@ -25,7 +25,6 @@ class User extends Authenticatable
         'fname',
         'lname',
         'dob',
-        'age',
         'photo',
         'email',
         'password',
@@ -34,6 +33,11 @@ class User extends Authenticatable
         'is_complete',
         'is_permission',
         'is_online',
+        'language',
+        'members_with_photo',
+        'vip_members',
+        'blur_photo',
+        'members_send_request',
     ];
 
     /**

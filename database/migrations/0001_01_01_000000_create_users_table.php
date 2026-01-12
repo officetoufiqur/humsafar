@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('fname')->nullable();
             $table->string('lname')->nullable();
             $table->date('dob')->nullable();
-            $table->integer('age')->nullable();
             $table->string('photo')->nullable();
             $table->string('email');
             $table->string('password');
@@ -27,6 +26,11 @@ return new class extends Migration
             $table->boolean('is_permission')->default(0);
             $table->timestamp('is_online')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('language')->nullable();
+            $table->boolean('members_with_photo')->nullable()->default(0);
+            $table->boolean('vip_members')->nullable()->default(0);
+            $table->boolean('blur_photo')->nullable()->default(0);
+            $table->boolean('members_send_request')->nullable()->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
