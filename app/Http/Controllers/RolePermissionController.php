@@ -141,4 +141,17 @@ class RolePermissionController extends Controller
 
         return $this->successResponse($role, 'Role updated successfully');
     }
+
+    public function roleDelete($id)
+    {
+        $role = Role::find($id);
+
+        if (! $role) {
+            return $this->errorResponse('Role not found', 404);
+        }
+
+        $role->delete();
+
+        return $this->successResponse(null, 'Role deleted successfully');
+    }
 }

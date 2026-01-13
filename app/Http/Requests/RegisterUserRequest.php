@@ -55,7 +55,6 @@ class RegisterUserRequest extends FormRequest
             'smoke' => 'required',
             'drinking' => 'required',
             'going_out' => 'required',
-            'package_id' => 'nullable|integer',
             'looking_gender' => 'required',
             'looking_origin' => 'required|string',
             'looking_relationship' => 'required|string',

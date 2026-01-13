@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::create('looking_fors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
-            $table->string('origin')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('age_range')->nullable();
-            $table->integer('height')->nullable(); 
-            $table->integer('weight')->nullable();
-            $table->string('religion')->nullable();
-            $table->string('relationship')->nullable();
-            $table->string('education')->nullable();
-            $table->string('rook')->nullable();
-            $table->string('drinking')->nullable();
-            $table->string('going_out')->nullable();
-            $table->unsignedTinyInteger('children')->nullable();
-            $table->string('location')->nullable();
-            $table->string('smoke')->nullable();
-            $table->unsignedSmallInteger('distance_km')->nullable();
+            $table->string('looking_origin')->nullable();
+            $table->string('looking_gender')->nullable();
+            $table->string('looking_age_range')->nullable();
+            $table->integer('looking_height')->nullable(); 
+            $table->integer('looking_weight')->nullable();
+            $table->string('looking_religion')->nullable();
+            $table->string('looking_relationship')->nullable();
+            $table->string('looking_education')->nullable();
+            $table->string('looking_rook')->nullable();
+            $table->string('looking_drinking')->nullable();
+            $table->string('looking_going_out')->nullable();
+            $table->unsignedTinyInteger('looking_children')->nullable();
+            $table->string('looking_location')->nullable();
+            $table->string('looking_smoke')->nullable();
+            $table->unsignedSmallInteger('looking_distance_km')->nullable();
 
             $table->timestamps();
         });

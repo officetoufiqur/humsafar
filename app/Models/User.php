@@ -6,14 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -79,5 +78,25 @@ class User extends Authenticatable
     public function profileVisits()
     {
         return $this->hasMany(ProfileVisit::class);
+    }
+
+    public function blockedUsers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'blocks',
+            'blocker_id',
+            'blocked_id'
+        );
+    }
+
+    public function blockedBy()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'blocks',
+            'blocked_id',
+            'blocker_id'
+        );
     }
 }

@@ -181,6 +181,18 @@ class MyProfileController extends Controller
         );
     }
 
+    public function getPartnerSetting()
+    {
+        $user = Auth::user();
+
+        $userData = LookingFor::where('user_id', $user->id)->first();
+
+        return $this->successResponse(
+            $userData,
+            'Partner setting fetched successfully',
+        );
+    }
+
     public function partnerSetting(Request $request)
     {
         $request->validate([
@@ -223,7 +235,6 @@ class MyProfileController extends Controller
 
         $partner->save();
 
-
         return $this->successResponse(
             $partner,
             'Partner setting updated successfully',
@@ -239,6 +250,93 @@ class MyProfileController extends Controller
         return $this->successResponse(
             null,
             'Account deleted successfully',
+        );
+    }
+
+    public function blockedProfile()
+    {
+        $user = Auth::user();
+
+        $blockedUsers = $user->blockedUsers()->get();
+
+        if ($blockedUsers->isEmpty()) {
+            return $this->errorResponse('No blocked users found', 404);
+        }
+
+        return $this->successResponse($blockedUsers, 'Blocked users');
+    }
+
+    public function blockUser($id)
+    {
+        $auth = Auth::user();
+
+        $user = User::find($id);
+
+        if ($auth->id === $user->id) {
+            return $this->errorResponse('You cannot block yourself', 400);
+        }
+
+        $alreadyBlocked = $auth->blockedUsers()
+            ->where('blocked_id', $user->id)
+            ->exists();
+
+        if ($alreadyBlocked) {
+            return $this->errorResponse('User already blocked', 409);
+        }
+
+        try {
+            $auth->blockedUsers()->attach($user->id);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return $this->errorResponse('User already blocked', 409);
+        }
+
+        return $this->successResponse(null, 'User blocked successfully');
+    }
+
+    public function unblockUser($id)
+    {
+        $auth = Auth::user();
+        $user = User::find($id);
+        $isBlocked = $auth->blockedUsers()
+            ->where('blocked_id', $user->id)
+            ->exists();
+
+        if (! $isBlocked) {
+            return $this->errorResponse('This user is not in your blocked list', 404);
+        }
+
+        $auth->blockedUsers()->detach($user->id);
+
+
+        return $this->successResponse(null, 'User unblocked successfully');
+    }
+
+    public function profileDetails($id)
+    {
+        $user = User::find($id);
+        $authUser = Auth::user();
+
+        if ($authUser->id === $user->id) {
+            return $this->errorResponse('You cannot view your own profile', 400);
+        }
+
+        if (! $user) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        $isBlocked = $authUser->blockedUsers()
+            ->where('blocked_id', $user->id)
+            ->exists();
+
+        if (! $isBlocked) {
+            return $this->errorResponse('This user is not in your blocked list', 403);
+        }
+
+        $user->load(['profile', 'lookingFor']);
+
+        return $this->successResponse(
+            $user,
+            'Profile details',
         );
     }
 }

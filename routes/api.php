@@ -12,6 +12,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,10 +30,9 @@ Route::controller(AdminAuthenticationController::class)->group(function () {
     Route::post('/admin/login', 'adminLogin');
 });
 
- Route::controller(AuthenticationController::class)->group(function () {
-        Route::post('/verify-otp', 'verifyOtp');
-    });
-    
+Route::controller(AuthenticationController::class)->group(function () {
+    Route::post('/verify-otp', 'verifyOtp');
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/roles/{id}', 'roleEdit');
         Route::post('/roles/{id}', 'roleUpdate');
         Route::get('/permissions', 'permissions');
+        Route::delete('/roles/delete/{id}', 'roleDelete');
     });
 
     Route::controller(PackageController::class)->group(function () {
@@ -110,7 +111,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/setting/update/password', 'updatePassword');
         Route::delete('/setting/delete/account', 'deleteAccount');
         Route::post('/setting/photo', 'photoSetting');
+        Route::get('/setting/partner', 'getPartnerSetting');
         Route::post('/setting/partner', 'partnerSetting');
+        Route::get('/blocked/profile', 'blockedProfile');
+        Route::get('/blocked/profile/details/{id}', 'profileDetails');
+        Route::post('/blocked/user/{id}', 'blockUser');
+        Route::post('/un-blocked/user/{id}', 'unblockUser');
+    });
+
+    Route::controller(TicketController::class)->group(function () {
+        Route::post('/support/tickets', 'store');
+
     });
 
 });
@@ -119,11 +130,11 @@ Route::controller(WorkController::class)->group(function () {
     Route::get('/works', 'index');
 });
 
- Route::controller(BlogController::class)->group(function () {
-        Route::get('/blog-category', 'gatCategory');
-        Route::get('/blogs', 'getBlogs');
-    });
-    
- Route::controller(FaqController::class)->group(function () {
-        Route::get('/faqs', 'index');
-    });
+Route::controller(BlogController::class)->group(function () {
+    Route::get('/blog-category', 'gatCategory');
+    Route::get('/blogs', 'getBlogs');
+});
+
+Route::controller(FaqController::class)->group(function () {
+    Route::get('/faqs', 'index');
+});

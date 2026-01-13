@@ -168,27 +168,26 @@ class AuthenticationController extends Controller
             'personal_attitude' => $validated['personal_attitude'],
             'smoke' => $validated['smoke'],
             'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out'],
-            'package_id' => $validated['package_id'],
+            'going_out' => $validated['going_out']
         ]);
 
         // Create LookingFor
         $lookingFor = LookingFor::where('user_id', $user->id)->first();
         $lookingFor->update([
-            'gender' => $validated['gender'],
-            'origin' => $validated['origin'],
-            'relationship' => $validated['relationship'],
-            'religion' => $validated['religion'],
-            'age_range' => $validated['age_range'],
-            'height' => $validated['height'],
-            'weight' => $validated['weight'],
-            'education' => $validated['education'],
-            'children' => $validated['children'],
-            'smoke' => $validated['smoke'],
-            'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out'],
-            'location' => $validated['location'],
-            'distance_km' => $validated['distance_km'],
+            'looking_gender' => $validated['looking_gender'],
+            'looking_origin' => $validated['looking_origin'],
+            'looking_relationship' => $validated['looking_relationship'],
+            'looking_religion' => $validated['looking_religion'],
+            'looking_age_range' => $validated['looking_age_range'],
+            'looking_height' => $validated['looking_height'],
+            'looking_weight' => $validated['looking_weight'],
+            'looking_education' => $validated['looking_education'],
+            'looking_children' => $validated['looking_children'],
+            'looking_smoke' => $validated['looking_smoke'],
+            'looking_drinking' => $validated['looking_drinking'],
+            'looking_going_out' => $validated['looking_going_out'],
+            'looking_location' => $validated['looking_location'],
+            'looking_distance_km' => $validated['looking_distance_km'],
         ]);
 
         $user = array_merge(
