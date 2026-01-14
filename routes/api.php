@@ -110,6 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(MyProfileController::class)->group(function () {
         Route::get('/setting/account', 'index');
+        Route::post('/setting/account/update', 'update');
         Route::post('/setting/update/password', 'updatePassword');
         Route::delete('/setting/delete/account', 'deleteAccount');
         Route::post('/setting/photo', 'photoSetting');

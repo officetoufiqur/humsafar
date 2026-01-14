@@ -28,11 +28,9 @@ class MyProfileController extends Controller
         );
     }
 
-    public function update(ProfileUpdateRequest $request)
+    public function update(Request $request)
     {
-        $validated = $request->validated();
-
-        $user = Auth::user();
+       $user = Auth::user();
 
         $file = null;
         if ($request->hasFile('photo')) {
@@ -46,65 +44,64 @@ class MyProfileController extends Controller
             return $this->errorResponse('User not found', 404);
         }
 
-        $user->dob = $validated['dob'];
+        $user->display_name = $request->display_name;
+        $user->fname = $request->fname;
+        $user->lname = $request->lname;
+        $user->dob = $request->dob;
         $user->photo = $file;
-        $user->is_accept = $validated['is_accept'];
-        $user->is_permission = $validated['is_permission'];
-        $user->is_complete = 1;
         $user->save();
 
         // Create profile
         $profile = Profile::where('user_id', $user->id)->first();
         $profile->update([
-            'gender' => $validated['gender'],
-            'origin' => $validated['origin'],
-            'age' => $validated['age'],
-            'looking_for' => $validated['looking_for'],
-            'relationship' => $validated['relationship'],
-            'children' => $validated['children'],
-            'religion' => $validated['religion'],
-            'hair_color' => $validated['hair_color'],
-            'eye_color' => $validated['eye_color'],
-            'body_type' => $validated['body_type'],
-            'appearance' => $validated['appearance'],
-            'intelligence' => $validated['intelligence'],
-            'clothing' => $validated['clothing'],
-            'mother_tongue' => $validated['mother_tongue'],
-            'known_language' => $validated['known_language'],
-            'weight' => $validated['weight'],
-            'height' => $validated['height'],
-            'education' => $validated['education'],
-            'career' => $validated['career'],
-            'about_me' => $validated['about_me'],
-            'sports' => $validated['sports'],
-            'music' => $validated['music'],
-            'cooking' => $validated['cooking'],
-            'reading' => $validated['reading'],
-            'tv_shows' => $validated['tv_shows'],
-            'personal_attitude' => $validated['personal_attitude'],
-            'smoke' => $validated['smoke'],
-            'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out'],
-            'package_id' => $validated['package_id'],
+            'gender' => $request->gender,
+            'origin' => $request->origin,
+            'age' => $request->age,
+            'looking_for' => $request->looking_for,
+            'relationship' => $request->relationship,
+            'children' => $request->children,
+            'religion' => $request->religion,
+            'hair_color' => $request->hair_color,
+            'eye_color' => $request->eye_color,
+            'body_type' => $request->body_type,
+            'appearance' => $request->appearance,
+            'intelligence' => $request->intelligence,
+            'clothing' => $request->clothing,
+            'mother_tongue' => $request->mother_tongue,
+            'known_language' => $request->known_language,
+            'weight' => $request->weight,
+            'height' => $request->height,
+            'education' => $request->education,
+            'career' => $request->career,
+            'about_me' => $request->about_me,
+            'sports' => $request->sports,
+            'music' => $request->music,
+            'cooking' => $request->cooking,
+            'reading' => $request->reading,
+            'tv_shows' => $request->tv_shows,
+            'personal_attitude' => $request->personal_attitude,
+            'smoke' => $request->smoke,
+            'drinking' => $request->drinking,
+            'going_out' => $request->going_out
         ]);
 
         // Create LookingFor
         $lookingFor = LookingFor::where('user_id', $user->id)->first();
         $lookingFor->update([
-            'gender' => $validated['gender'],
-            'origin' => $validated['origin'],
-            'relationship' => $validated['relationship'],
-            'religion' => $validated['religion'],
-            'age_range' => $validated['age_range'],
-            'height' => $validated['height'],
-            'weight' => $validated['weight'],
-            'education' => $validated['education'],
-            'children' => $validated['children'],
-            'smoke' => $validated['smoke'],
-            'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out'],
-            'location' => $validated['location'],
-            'distance_km' => $validated['distance_km'],
+            'gender' => $request->gender,
+            'origin' => $request->origin,
+            'relationship' => $request->relationship,
+            'religion' => $request->religion,
+            'age_range' => $request->age_range,
+            'height' => $request->height,
+            'weight' => $request->weight,
+            'education' => $request->education,
+            'children' => $request->children,
+            'smoke' => $request->smoke,
+            'drinking' => $request->drinking,
+            'going_out' => $request->going_out,
+            'location' => $request->location,
+            'distance_km' => $request->distance_km,
         ]);
 
         $user = array_merge(

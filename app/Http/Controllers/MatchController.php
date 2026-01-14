@@ -14,7 +14,6 @@ class MatchController extends Controller
         $user = Auth::user();
 
         $pref = LookingFor::where('user_id', $user->id)->first();
-
         if (! $pref) {
             return response()->json([
                 'status' => false,
@@ -22,12 +21,21 @@ class MatchController extends Controller
             ]);
         }
 
-        $query = Profile::where('user_id', '!=', $user->id);
+        $onlyOnline = $request->query('online');
+        $onlineLimit = now()->subMinutes(5);
 
         $ageMin = 0;
         $ageMax = 100;
         if ($pref->looking_age_range) {
             [$ageMin,$ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
+        }
+
+        $query = Profile::join('users', 'users.id', '=', 'profiles.user_id')
+            ->where('profiles.user_id', '!=', $user->id);
+
+        if ($onlyOnline === 'true') {
+            $query->whereNotNull('users.is_online')
+                ->where('users.is_online', '>=', $onlineLimit);
         }
 
         $query->selectRaw('
@@ -44,7 +52,9 @@ class MatchController extends Controller
                 (CASE WHEN going_out = ? THEN 5 ELSE 0 END)
             ) +
             (CASE WHEN origin = ? THEN 10 ELSE 0 END)
-        ) AS score
+        ) AS score,
+
+        IF(users.is_online >= ?, "online", "offline") AS online_status
     ', [
             $pref->looking_religion,
             $ageMin, $ageMax,
@@ -54,6 +64,7 @@ class MatchController extends Controller
             $pref->looking_drinking,
             $pref->looking_going_out,
             $pref->looking_origin,
+            $onlineLimit,
         ]);
 
         $matches = $query->orderByDesc('score')
