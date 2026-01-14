@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
-            $table->enum('gender', ['male', 'female', 'other']);
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
+            $table->foreignId('package_id')->nullable()->constrained('packages')->cascadeOnDelete();
+            $table->string('gender')->nullable();
+            $table->integer('age')->nullable();
             $table->string('origin')->nullable();
             $table->string('looking_for')->nullable();
             $table->string('relationship')->nullable();
@@ -40,11 +42,9 @@ return new class extends Migration
             $table->json('reading')->nullable();
             $table->json('tv_shows')->nullable();
             $table->json('personal_attitude')->nullable();
-            $table->enum('smoke', ['no', 'occasionally', 'yes'])->nullable();
-            $table->enum('drinking', ['no', 'occasionally', 'yes'])->nullable();
-            $table->enum('going_out', ['never', 'sometimes', 'often'])->nullable();
-            $table->string('membership_name')->nullable();
-            $table->decimal('membership_amount', 10, 2)->nullable();
+            $table->string('smoke')->nullable();
+            $table->string('drinking')->nullable();
+            $table->string('going_out')->nullable();
 
             $table->timestamps();
         });
