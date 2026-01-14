@@ -69,7 +69,7 @@ class RegisterUserRequest extends FormRequest
             'looking_going_out' => 'required',
             'looking_location' => 'required|string',
             'looking_distance_km' => 'required|integer',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'photo' => 'nullable|string',
         ];
     }
 }

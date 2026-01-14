@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ticket_replays', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->cascadeOnDelete();
-            $table->text('reply');
+            $table->text('reply')->nullable();
             $table->timestamps();
         });
     }

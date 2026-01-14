@@ -105,7 +105,7 @@ class AuthenticationController extends Controller
     {
         $package = Package::where('status', 1)->get();
 
-        if (!$package) {
+        if (! $package) {
             return $this->errorResponse('Package not found', 404);
         }
 
@@ -119,19 +119,19 @@ class AuthenticationController extends Controller
     {
         $validated = $request->validated();
 
-        $file = null;
-        if ($request->hasFile('photo')) {
-            $file = FileUpload::storeFile($request->file('photo'), 'uploads/users');
-        }
+        // $file = null;
+        // if ($request->hasFile('photo')) {
+        //     $file = FileUpload::storeFile($request->file('photo'), 'uploads/users');
+        // }
 
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return $this->errorResponse('User not found', 404);
         }
 
         $user->dob = $validated['dob'];
-        $user->photo = $file;
+        $user->photo = $validated['photo'];
         $user->is_accept = $validated['is_accept'];
         $user->is_permission = $validated['is_permission'];
         $user->is_complete = 1;
@@ -168,7 +168,7 @@ class AuthenticationController extends Controller
             'personal_attitude' => $validated['personal_attitude'],
             'smoke' => $validated['smoke'],
             'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out']
+            'going_out' => $validated['going_out'],
         ]);
 
         // Create LookingFor
@@ -237,6 +237,27 @@ class AuthenticationController extends Controller
         return $this->successResponse(
             $data,
             'Login successful',
+        );
+    }
+
+    public function fileUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required',
+            'file.*' => 'file|max:2048',
+        ]);
+
+        $uploadedFiles = [];
+
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $singleFile) {
+                $uploadedFiles[] = FileUpload::storeFile($singleFile, 'uploads/users');
+            }
+        }
+
+        return $this->successResponse(
+            $uploadedFiles,
+            'Files uploaded successfully'
         );
     }
 }

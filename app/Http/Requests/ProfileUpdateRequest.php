@@ -70,7 +70,7 @@ class ProfileUpdateRequest extends FormRequest
             'looking_going_out' => 'nullable',
             'looking_location' => 'nullable|string',
             'looking_distance_km' => 'nullable|integer',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'photo' => 'nullable|string',
         ];
     }
 }

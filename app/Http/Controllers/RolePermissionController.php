@@ -142,6 +142,30 @@ class RolePermissionController extends Controller
         return $this->successResponse($role, 'Role updated successfully');
     }
 
+     public function roleView($id)
+    {
+        $role = Role::with('permissions:id,name')->find($id);
+
+        if (! $role) {
+            return $this->errorResponse('Role not found', 404);
+        }
+
+        $permissions = Permission::select('id', 'name')->get();
+
+        $modelRoles = DB::table('model_has_roles')
+            ->where('role_id', $id)
+            ->select('model_id')
+            ->count();
+
+        $data = [
+            'role' => $role,
+            'roleCount' => $modelRoles,
+            'permissions' => $permissions,
+        ];
+
+        return $this->successResponse($data, 'Role fetched successfully');
+    }
+
     public function roleDelete($id)
     {
         $role = Role::find($id);

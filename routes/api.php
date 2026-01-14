@@ -36,6 +36,7 @@ Route::controller(AuthenticationController::class)->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
+    Route::post('/file-upload', [AuthenticationController::class, 'fileUpload']);
     Route::get('/membership', [AuthenticationController::class, 'membership']);
 
     Route::controller(RolePermissionController::class)->group(function () {
@@ -43,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/roles', 'roles');
         Route::post('/roles', 'roleStore');
         Route::get('/roles/{id}', 'roleEdit');
+        Route::get('/roles/view/{id}', 'roleView');
         Route::post('/roles/{id}', 'roleUpdate');
         Route::get('/permissions', 'permissions');
         Route::delete('/roles/delete/{id}', 'roleDelete');
@@ -120,8 +122,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(TicketController::class)->group(function () {
+        Route::get('/support/tickets', 'index');
         Route::post('/support/tickets', 'store');
-
+        Route::get('/support/tickets/{id}', 'show');
+        Route::post('/support/tickets/reply/{id}', 'reply');
     });
 
 });
