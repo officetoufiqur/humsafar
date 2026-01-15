@@ -1,15 +1,18 @@
 <?php
 
+use App\Http\Controllers\AdvanceSearchController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileAttributeController;
+use App\Http\Controllers\ProfileVisitController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\TicketController;
@@ -87,7 +90,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(BannerController::class)->group(function () {
-        Route::post('/news-letters', 'newsLetters');
+        Route::get('/news-letters', 'newsLetters');
+        Route::get('/news-letters/{id}', 'newsLettersView');
+        Route::post('/news-letters', 'newsLetterStore');
+        Route::get('/banners', 'index');
+        Route::post('/banners', 'store');
+        Route::get('/banners/{id}', 'edit');
+        Route::post('/banners/{id}', 'update');
+        Route::get('/banners/{id}', 'view');
+        Route::post('/banners/status/{id}', 'updateStatus');
     });
 
     Route::controller(BlogController::class)->group(function () {
@@ -127,6 +138,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/support/tickets', 'store');
         Route::get('/support/tickets/{id}', 'show');
         Route::post('/support/tickets/reply/{id}', 'reply');
+    });
+
+    Route::controller(ProfileVisitController::class)->group(function () {
+        Route::get('/profile-visit', 'index');
+        Route::post('/profile-visit/{id}', 'store');
+    });
+
+    Route::controller(AdvanceSearchController::class)->group(function () {
+        Route::get('/search-profiles', 'searchProfiles');
+    });
+
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/dashboard', 'index');
+        Route::get('/members-you-may-like', 'membersYouMayLike');
     });
 
 });

@@ -58,7 +58,7 @@ class AuthenticationController extends Controller
         $user->otp = $otp;
         $user->save();
 
-        Mail::to($user->email)->send(new SendOtp($otp));
+        // Mail::to($user->email)->send(new SendOtp($otp));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
