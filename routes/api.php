@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
@@ -152,6 +153,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/dashboard', 'index');
         Route::get('/members-you-may-like', 'membersYouMayLike');
+    });
+
+
+    Route::controller(ComplaintController::class)->group(function () {
+        Route::get('/complaints', 'index');
+        Route::get('/complaints/{id}', 'show');
+        Route::post('/complaints', 'store');
+        Route::post('/complaints/replay/{id}', 'storeReplay');
+        Route::post('/complaints/block/{id}', 'updateBlock');
+        Route::post('/complaints/dismiss/{id}', 'updateDismiss');
     });
 
 });

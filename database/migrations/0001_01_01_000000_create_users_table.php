@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('display_name');
+            $table->string('display_name')->nullable();
             $table->string('fname')->nullable();
             $table->string('lname')->nullable();
             $table->date('dob')->nullable();
@@ -31,6 +31,7 @@ return new class extends Migration
             $table->boolean('vip_members')->nullable()->default(0);
             $table->boolean('blur_photo')->nullable()->default(0);
             $table->boolean('members_send_request')->nullable()->default(0);
+            $table->enum('status',['blocked','active'])->default('active');
             $table->rememberToken();
             $table->timestamps();
         });

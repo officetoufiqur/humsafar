@@ -53,56 +53,57 @@ class MyProfileController extends Controller
 
         // Create profile
         $profile = Profile::where('user_id', $user->id)->first();
-        $profile->update([
-            'gender' => $request->gender,
-            'origin' => $request->origin,
-            'age' => $request->age,
-            'looking_for' => $request->looking_for,
-            'relationship' => $request->relationship,
-            'children' => $request->children,
-            'religion' => $request->religion,
-            'hair_color' => $request->hair_color,
-            'eye_color' => $request->eye_color,
-            'body_type' => $request->body_type,
-            'appearance' => $request->appearance,
-            'intelligence' => $request->intelligence,
-            'clothing' => $request->clothing,
-            'mother_tongue' => $request->mother_tongue,
-            'known_language' => $request->known_language,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'education' => $request->education,
-            'career' => $request->career,
-            'about_me' => $request->about_me,
-            'sports' => $request->sports,
-            'music' => $request->music,
-            'cooking' => $request->cooking,
-            'reading' => $request->reading,
-            'tv_shows' => $request->tv_shows,
-            'personal_attitude' => $request->personal_attitude,
-            'smoke' => $request->smoke,
-            'drinking' => $request->drinking,
-            'going_out' => $request->going_out
-        ]);
+
+        $profile->gender = $request->gender;
+        $profile->origin = $request->origin;
+        $profile->age = $request->age;
+        $profile->looking_for = $request->looking_for;
+        $profile->relationship = $request->relationship;
+        $profile->children = $request->children;
+        $profile->religion = $request->religion;
+        $profile->location = $request->location;
+        $profile->hair_color = $request->hair_color;
+        $profile->eye_color = $request->eye_color;
+        $profile->body_type = $request->body_type;
+        $profile->appearance = $request->appearance;
+        $profile->intelligence = $request->intelligence;
+        $profile->clothing = $request->clothing;
+        $profile->mother_tongue = $request->mother_tongue;
+        $profile->known_language = $request->known_language;
+        $profile->weight = $request->weight;
+        $profile->height = $request->height;
+        $profile->education = $request->education;
+        $profile->career = $request->career;
+        $profile->about_me = $request->about_me;
+        $profile->sports = $request->sports;
+        $profile->music = $request->music;
+        $profile->cooking = $request->cooking;
+        $profile->reading = $request->reading;
+        $profile->tv_shows = $request->tv_shows;
+        $profile->personal_attitude = $request->personal_attitude;
+        $profile->smoke = $request->smoke;
+        $profile->drinking = $request->drinking;
+        $profile->going_out = $request->going_out;
+        $profile->save();
 
         // Create LookingFor
         $lookingFor = LookingFor::where('user_id', $user->id)->first();
-        $lookingFor->update([
-            'gender' => $request->gender,
-            'origin' => $request->origin,
-            'relationship' => $request->relationship,
-            'religion' => $request->religion,
-            'age_range' => $request->age_range,
-            'height' => $request->height,
-            'weight' => $request->weight,
-            'education' => $request->education,
-            'children' => $request->children,
-            'smoke' => $request->smoke,
-            'drinking' => $request->drinking,
-            'going_out' => $request->going_out,
-            'location' => $request->location,
-            'distance_km' => $request->distance_km,
-        ]);
+
+        $lookingFor->looking_gender = $request->looking_gender;
+        $lookingFor->looking_origin = $request->looking_origin;
+        $lookingFor->looking_relationship = $request->looking_relationship;
+        $lookingFor->looking_religion = $request->looking_religion;
+        $lookingFor->looking_age_range = $request->looking_age_range;
+        $lookingFor->looking_height = $request->looking_height;
+        $lookingFor->looking_weight = $request->looking_weight;
+        $lookingFor->looking_education = $request->looking_education;
+        $lookingFor->looking_children = $request->looking_children;
+        $lookingFor->looking_smoke = $request->looking_smoke;
+        $lookingFor->looking_drinking = $request->looking_drinking;
+        $lookingFor->looking_going_out = $request->looking_going_out;
+        $lookingFor->looking_location = $request->looking_location;
+        $lookingFor->looking_distance_km = $request->looking_distance_km;
+        $lookingFor->save();
 
         $user = array_merge(
             $user->toArray(),

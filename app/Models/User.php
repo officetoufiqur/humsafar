@@ -37,6 +37,7 @@ class User extends Authenticatable
         'vip_members',
         'blur_photo',
         'members_send_request',
+        'status',
     ];
 
     /**

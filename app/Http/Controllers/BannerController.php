@@ -8,6 +8,7 @@ use App\Models\NewsLetter;
 use App\Trait\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BannerController extends Controller
 {
@@ -71,39 +72,67 @@ class BannerController extends Controller
         $dates = explode(' - ', $request->date);
 
         if (count($dates) !== 2) {
-            return response()->json(['message' => 'Invalid date range format'], 422);
+            return response()->json([
+                'message' => 'Invalid date range format. Example: Jan 15, 2026 - Jan 20, 2026',
+            ], 422);
         }
 
         try {
-            $start_date = Carbon::createFromFormat('M d, Y', trim($dates[0]))->format('Y-m-d');
-            $end_date = Carbon::createFromFormat('M d, Y', trim($dates[1]))->format('Y-m-d');
+            $start = Carbon::parse(trim($dates[0]));
+            $end = Carbon::parse(trim($dates[1]));
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid date format. Use: Jan 15, 2026 - Jan 20, 2026'], 422);
+            return response()->json([
+                'message' => 'Invalid date values',
+            ], 422);
         }
 
-        if ($end_date < $start_date) {
-            return response()->json(['message' => 'End date must be after start date'], 422);
+        if ($start->gt($end)) {
+            return response()->json([
+                'message' => 'End date must be after start date',
+            ], 422);
         }
 
-        $file = null;
-        if ($request->hasFile('image')) {
-            $file = FileUpload::storeFile($request->file('image'), 'uploads/banners');
+        DB::beginTransaction();
+
+        try {
+
+            $file = FileUpload::storeFile(
+                $request->file('image'),
+                'uploads/banners'
+            );
+
+            $banner = Banner::create([
+                'name' => $request->name,
+                'link' => $request->link,
+
+                'start_date' => $start->format('Y-m-d'),
+                'end_date' => $end->format('Y-m-d'),
+
+                'cpm' => $request->cpm,
+                'page_name' => $request->page_name,
+                'image' => $file,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Banner created successfully',
+                'data' => $banner,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            if (isset($file)) {
+                FileUpload::deleteFile($file);
+            }
+
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $banner = Banner::create([
-            'name' => $request->name,
-            'link' => $request->link,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'cpm' => $request->cpm,
-            'page_name' => $request->page_name,
-            'image' => $file,
-        ]);
-
-        return response()->json([
-            'message' => 'Banner created successfully',
-            'data' => $banner,
-        ]);
     }
 
     public function edit($id)
@@ -127,40 +156,69 @@ class BannerController extends Controller
         $dates = explode(' - ', $request->date);
 
         if (count($dates) !== 2) {
-            return response()->json(['message' => 'Invalid date range format'], 422);
+            return response()->json([
+                'message' => 'Invalid date range format',
+            ], 422);
         }
 
         try {
-            $start_date = Carbon::createFromFormat('M d, Y', trim($dates[0]))->format('Y-m-d');
-            $end_date = Carbon::createFromFormat('M d, Y', trim($dates[1]))->format('Y-m-d');
+            $start = Carbon::parse(trim($dates[0]));
+            $end = Carbon::parse(trim($dates[1]));
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid date format. Use: Jan 15, 2026 - Jan 20, 2026'], 422);
+            return response()->json([
+                'message' => 'Invalid date format',
+            ], 422);
         }
 
-        if ($end_date < $start_date) {
-            return response()->json(['message' => 'End date must be after start date'], 422);
+        if ($start->gt($end)) {
+            return response()->json([
+                'message' => 'End date must be after start date',
+            ], 422);
         }
 
-        if ($request->hasFile('image')) {
-            if ($banner->image && file_exists(public_path($banner->image))) {
-                unlink(public_path($banner->image));
+        DB::beginTransaction();
+
+        try {
+            if ($request->hasFile('image')) {
+                if ($banner->image && file_exists(public_path($banner->image))) {
+                    unlink(public_path($banner->image));
+                }
+
+                $file = FileUpload::storeFile(
+                    $request->file('image'),
+                    'uploads/banners'
+                );
+
+                $banner->image = $file;
             }
-            $file = FileUpload::storeFile($request->file('image'), 'uploads/banners');
-            $banner->image = $file;
+
+            $banner->update([
+                'name' => $request->name,
+                'link' => $request->link,
+
+                'start_date' => $start->format('Y-m-d'),
+                'end_date' => $end->format('Y-m-d'),
+
+                'cpm' => $request->cpm,
+                'page_name' => $request->page_name,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Banner updated successfully',
+                'data' => $banner,
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $banner->name = $request->name;
-        $banner->link = $request->link;
-        $banner->start_date = $start_date;
-        $banner->end_date = $end_date;
-        $banner->cpm = $request->cpm;
-        $banner->page_name = $request->page_name;
-        $banner->save();
-
-        return response()->json([
-            'message' => 'Banner updated successfully',
-            'data' => $banner,
-        ]);
     }
 
     public function view($id)
@@ -171,9 +229,9 @@ class BannerController extends Controller
     public function updateStatus($id)
     {
         $banner = Banner::find($id);
-        $banner->status = !$banner->status;
+        $banner->status = ! $banner->status;
         $banner->save();
 
-        return $this->successResponse($banner, "Banner status updated successfully");
+        return $this->successResponse($banner, 'Banner status updated successfully');
     }
 }
