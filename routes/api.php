@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdvanceSearchController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
@@ -164,6 +165,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/complaints/block/{id}', 'updateBlock');
         Route::post('/complaints/dismiss/{id}', 'updateDismiss');
     });
+
+    Route::get('/chat/messages/{id}', [ChatController::class, 'messages']);
+    Route::post('/chat/send/{id}', [ChatController::class, 'send']);
 
 });
 

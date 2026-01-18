@@ -43,7 +43,7 @@ class ComplaintController extends Controller
 
     public function show($id)
     {
-        $complaint = Complaint::findOrFail($id);
+        $complaint = Complaint::with('replies')->findOrFail($id);
 
         if (! $complaint) {
             return $this->errorResponse('Complaint not found', 404);

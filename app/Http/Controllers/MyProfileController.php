@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileUpload;
-use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\LookingFor;
 use App\Models\Profile;
 use App\Models\User;
@@ -30,7 +29,7 @@ class MyProfileController extends Controller
 
     public function update(Request $request)
     {
-       $user = Auth::user();
+        $user = Auth::user();
 
         $file = null;
         if ($request->hasFile('photo')) {
@@ -255,13 +254,13 @@ class MyProfileController extends Controller
     {
         $user = Auth::user();
 
-        $blockedUsers = $user->blockedUsers()->get();
+        $blockedUsers = $user->blockedUsers()->with('profile:id,user_id,age,location')->get();
 
         if ($blockedUsers->isEmpty()) {
             return $this->errorResponse('No blocked users found', 404);
         }
 
-        return $this->successResponse($blockedUsers, 'Blocked users');
+        return $this->successResponse($blockedUsers, 'Blocked users fetched successfully');
     }
 
     public function blockUser($id)
@@ -304,7 +303,6 @@ class MyProfileController extends Controller
         }
 
         $auth->blockedUsers()->detach($user->id);
-
 
         return $this->successResponse(null, 'User unblocked successfully');
     }
