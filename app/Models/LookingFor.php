@@ -25,6 +25,9 @@ class LookingFor extends Model
         'looking_going_out',
         'looking_location',
         'looking_distance_km',
+        'looking_country',
+        'looking_state',
+        'looking_city'
     ];
 
     public function user()

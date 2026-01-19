@@ -193,42 +193,40 @@ class MyProfileController extends Controller
     public function partnerSetting(Request $request)
     {
         $request->validate([
-            'origin' => 'required|string|max:100',
-            'gender' => 'required',
-            'age_range' => 'required',
-            'weight' => 'required|integer|min:30|max:200',
-            'height' => 'required|integer|min:100|max:250',
-            'religion' => 'required|string|max:50',
-            'relationship' => 'required',
-            'education' => 'required|string|max:500',
-            'rook' => 'required',
-            'drinking' => 'required',
-            'going_out' => 'required',
-            'children' => 'required',
-            'location' => 'required',
-            'smoke' => 'required',
-            'distance_km' => 'required|integer|min:1|max:500',
+            'looking_origin' => 'required|string|max:100',
+            'looking_gender' => 'required',
+            'looking_age_range' => 'required',
+            'looking_weight' => 'required|integer|min:0|max:200',
+            'looking_height' => 'required|integer|min:0|max:250',
+            'looking_religion' => 'required|string|max:50',
+            'looking_relationship' => 'required',
+            'looking_education' => 'required|string|max:500',
+            'looking_drinking' => 'required',
+            'looking_going_out' => 'required',
+            'looking_children' => 'required',
+            'looking_location' => 'required',
+            'looking_smoke' => 'required',
+            'looking_distance_km' => 'required|integer|min:1|max:500',
         ]);
 
         $user = Auth::user();
 
         $partner = LookingFor::where('user_id', $user->id)->first();
 
-        $partner->origin = $request->origin;
-        $partner->gender = $request->gender;
-        $partner->age_range = $request->age_range;
-        $partner->weight = $request->weight;
-        $partner->height = $request->height;
-        $partner->religion = $request->religion;
-        $partner->relationship = $request->relationship;
-        $partner->education = $request->education;
-        $partner->rook = $request->rook;
-        $partner->drinking = $request->drinking;
-        $partner->going_out = $request->going_out;
-        $partner->children = $request->children;
-        $partner->location = $request->location;
-        $partner->smoke = $request->smoke;
-        $partner->distance_km = $request->distance_km;
+        $partner->looking_origin = $request->looking_origin;
+        $partner->looking_gender = $request->looking_gender;
+        $partner->looking_age_range = $request->looking_age_range;
+        $partner->looking_weight = $request->looking_weight;
+        $partner->looking_height = $request->looking_height;
+        $partner->looking_religion = $request->looking_religion;
+        $partner->looking_relationship = $request->looking_relationship;
+        $partner->looking_education = $request->looking_education;
+        $partner->looking_drinking = $request->looking_drinking;
+        $partner->looking_going_out = $request->looking_going_out;
+        $partner->looking_children = $request->looking_children;
+        $partner->looking_location = $request->looking_location;
+        $partner->looking_smoke = $request->looking_smoke;
+        $partner->looking_distance_km = $request->looking_distance_km;
 
         $partner->save();
 

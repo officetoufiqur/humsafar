@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileAttributeController;
@@ -168,6 +169,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/chat/messages/{id}', [ChatController::class, 'messages']);
     Route::post('/chat/send/{id}', [ChatController::class, 'send']);
+
+    Route::controller(MemberController::class)->group(function () {
+        Route::get('/members', 'index');
+        Route::get('/members/view/{id}', 'view');
+        Route::post('/members', 'store');
+        Route::post('/members/{id}', 'update');
+        Route::post('/members/status/{id}', 'statusUpdate');
+        Route::delete('/members/{id}', 'destroy');
+    });
 
 });
 

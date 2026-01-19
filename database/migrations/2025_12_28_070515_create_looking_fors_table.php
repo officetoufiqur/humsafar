@@ -25,8 +25,11 @@ return new class extends Migration
             $table->string('looking_rook')->nullable();
             $table->string('looking_drinking')->nullable();
             $table->string('looking_going_out')->nullable();
-            $table->unsignedTinyInteger('looking_children')->nullable();
+            $table->string('looking_children')->nullable();
             $table->string('looking_location')->nullable();
+            $table->string('looking_country')->nullable();
+            $table->string('looking_state')->nullable();
+            $table->string('looking_city')->nullable();
             $table->string('looking_smoke')->nullable();
             $table->unsignedSmallInteger('looking_distance_km')->nullable();
 

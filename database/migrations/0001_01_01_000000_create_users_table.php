@@ -31,7 +31,7 @@ return new class extends Migration
             $table->boolean('vip_members')->nullable()->default(0);
             $table->boolean('blur_photo')->nullable()->default(0);
             $table->boolean('members_send_request')->nullable()->default(0);
-            $table->enum('status',['blocked','active'])->default('active');
+            $table->enum('status',['active','inactive','blocked','unblocked'])->default('active');
             $table->rememberToken();
             $table->timestamps();
         });
