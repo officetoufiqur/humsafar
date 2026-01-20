@@ -131,7 +131,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/setting/partner', 'getPartnerSetting');
         Route::post('/setting/partner', 'partnerSetting');
         Route::get('/blocked/profile', 'blockedProfile');
-        Route::get('/blocked/profile/details/{id}', 'profileDetails');
+        Route::get('/profile/details/{id}', 'profileDetails');
         Route::post('/blocked/user/{id}', 'blockUser');
         Route::post('/un-blocked/user/{id}', 'unblockUser');
     });

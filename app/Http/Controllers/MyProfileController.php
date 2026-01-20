@@ -272,6 +272,7 @@ class MyProfileController extends Controller
         }
 
         $alreadyBlocked = $auth->blockedUsers()
+        
             ->where('blocked_id', $user->id)
             ->exists();
 

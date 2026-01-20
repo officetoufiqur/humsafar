@@ -40,6 +40,10 @@ class MatchController extends Controller
 
         $query->selectRaw('
         profiles.*,
+        users.fname,
+        users.lname,
+        users.display_name,
+        profiles.location as profile_location,
 
         (
             (CASE WHEN religion = ? THEN 25 ELSE 0 END) +
