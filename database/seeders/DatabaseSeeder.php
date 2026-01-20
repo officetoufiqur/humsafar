@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             WorkSeeder::class,
             WorkStepSeeder::class,
             ProfileAttributeSeeder::class,
+            FrontendSettingSeeder::class
         ]);
     }
 }

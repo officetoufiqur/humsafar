@@ -31,12 +31,12 @@ class MyProfileController extends Controller
     {
         $user = Auth::user();
 
-        $file = null;
         if ($request->hasFile('photo')) {
             if ($user->photo) {
                 FileUpload::deleteFile($user->photo);
             }
             $file = FileUpload::storeFile($request->file('photo'), 'uploads/users');
+            $user->photo = $file;
         }
 
         if (! $user) {
@@ -47,7 +47,6 @@ class MyProfileController extends Controller
         $user->fname = $request->fname;
         $user->lname = $request->lname;
         $user->dob = $request->dob;
-        $user->photo = $file;
         $user->save();
 
         // Create profile
@@ -272,7 +271,7 @@ class MyProfileController extends Controller
         }
 
         $alreadyBlocked = $auth->blockedUsers()
-        
+
             ->where('blocked_id', $user->id)
             ->exists();
 
@@ -308,30 +307,20 @@ class MyProfileController extends Controller
 
     public function profileDetails($id)
     {
-        $user = User::find($id);
         $authUser = Auth::user();
-
-        if ($authUser->id === $user->id) {
+        if ($authUser->id == $id) {
             return $this->errorResponse('You cannot view your own profile', 400);
         }
+
+        $user = User::with(['profile', 'lookingFor'])->find($id);
 
         if (! $user) {
             return $this->errorResponse('User not found', 404);
         }
 
-        $isBlocked = $authUser->blockedUsers()
-            ->where('blocked_id', $user->id)
-            ->exists();
-
-        if (! $isBlocked) {
-            return $this->errorResponse('This user is not in your blocked list', 403);
-        }
-
-        $user->load(['profile', 'lookingFor']);
-
         return $this->successResponse(
             $user,
-            'Profile details',
+            'Profile details'
         );
     }
 }

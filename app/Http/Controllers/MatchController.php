@@ -24,15 +24,18 @@ class MatchController extends Controller
         $onlyOnline = $request->query('online');
         $onlineLimit = now()->subMinutes(5);
 
-        
         $ageMin = 0;
         $ageMax = 100;
+
         if ($pref->looking_age_range) {
-            [$ageMin,$ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
+            [$ageMin, $ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
         }
 
+        $blockedIds = $user->blockedUsers()->pluck('users.id');
+
         $query = Profile::join('users', 'users.id', '=', 'profiles.user_id')
-            ->where('profiles.user_id', '!=', $user->id);
+            ->where('profiles.user_id', '!=', $user->id)
+            ->whereNotIn('profiles.user_id', $blockedIds);
 
         if ($onlyOnline === 'true') {
             $query->whereNotNull('users.is_online')
@@ -41,6 +44,7 @@ class MatchController extends Controller
 
         $query->selectRaw('
         profiles.*,
+        users.photo,
         users.fname,
         users.lname,
         users.display_name,

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;

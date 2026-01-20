@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('origin')->nullable();
             $table->string('looking_for')->nullable();
             $table->string('relationship')->nullable();
-            $table->unsignedTinyInteger('children')->nullable();
+            $table->string('children')->nullable();
             $table->string('religion')->nullable();
             $table->string('location')->nullable();
             $table->string('hair_color')->nullable();
@@ -32,8 +32,8 @@ return new class extends Migration
             $table->string('mother_tongue')->nullable();
             $table->string('known_language')->nullable();
             $table->string('language')->nullable();
-            $table->unsignedSmallInteger('weight')->nullable(); 
-            $table->unsignedSmallInteger('height')->nullable();
+            $table->string('weight')->nullable(); 
+            $table->string('height')->nullable();
             $table->string('education')->nullable();
             $table->string('career')->nullable();
             $table->longText('about_me')->nullable();
