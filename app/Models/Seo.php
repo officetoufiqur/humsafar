@@ -9,5 +9,10 @@ class Seo extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['meta_title','meta_description','meta_keywords','image'];
+    protected $fillable = ['frontend_id','meta_title','meta_description','meta_keywords','meta_image','page_type','show_header'];
+
+    public function frontend()
+    {
+        return $this->belongsTo(FrontendSetting::class);
+    }
 }

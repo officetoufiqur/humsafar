@@ -7,10 +7,10 @@ use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ComplaintController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\FrontendSettingController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MyProfileController;
@@ -128,6 +128,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/setting/account/update', 'update');
         Route::post('/setting/update/password', 'updatePassword');
         Route::delete('/setting/delete/account', 'deleteAccount');
+        Route::get('/setting/photo', 'getPhotoSetting');
         Route::post('/setting/photo', 'photoSetting');
         Route::get('/setting/partner', 'getPartnerSetting');
         Route::post('/setting/partner', 'partnerSetting');
@@ -178,6 +179,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/members/{id}', 'update');
         Route::post('/members/status/{id}', 'statusUpdate');
         Route::delete('/members/{id}', 'destroy');
+    });
+
+    Route::controller(FrontendSettingController::class)->group(function () {
+        Route::get('/frontends/setting', 'index');
+        Route::get('/frontends/setting/edit/{id}', 'edit');
+        Route::post('/frontends/setting/update/{id}', 'update');
     });
 
 });

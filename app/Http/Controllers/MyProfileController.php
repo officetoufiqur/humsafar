@@ -160,6 +160,24 @@ class MyProfileController extends Controller
         );
     }
 
+    public function getPhotoSetting()
+    {
+        $user = Auth::user();
+
+        $photoSetting = User::where('id', $user->id)->select(
+            'id',
+            'members_with_photo',
+            'vip_members',
+            'blur_photo',
+            'members_send_request',
+        )->first();
+
+        return $this->successResponse(
+            $photoSetting,
+            'Photo setting fetched successfully',
+        );
+    }
+
     public function photoSetting(Request $request)
     {
         $user = Auth::user();
