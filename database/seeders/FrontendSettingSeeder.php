@@ -48,7 +48,7 @@ class FrontendSettingSeeder extends Seeder
             ],
             [
                 'page_name' => 'Term and conditions',
-                'slug' => 'term-and-conditions',
+                'slug' => 'terms-and-conditions',
                 'content' => json_encode(['title' => 'Term and conditions Page']),
                 'url' => 'https://ticketprijs.nl/terms',
                 'is_active' => true,

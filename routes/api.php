@@ -14,6 +14,7 @@ use App\Http\Controllers\FrontendSettingController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MyProfileController;
+use App\Http\Controllers\NotificationConteoller;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\ProfileVisitController;
@@ -185,6 +186,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/frontends/setting', 'index');
         Route::get('/frontends/setting/edit/{id}', 'edit');
         Route::post('/frontends/setting/update/{id}', 'update');
+    });
+
+    Route::controller(NotificationConteoller::class)->group(function () {
+        Route::get('/user/notifications/received', 'getReceivedNotifications');
+        Route::post('/user/link/{id}', 'userLike');
     });
 
 });

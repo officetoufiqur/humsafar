@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdvanceSearchController extends Controller
 {
+    use ApiResponse;
+
     public function searchProfiles(Request $request)
     {
         $authId = Auth::user()->id;
 
+        $onlyOnline = $request->query('online');
+        $onlineLimit = now()->subMinutes(5);
+
         $users = User::with('profile')
             ->where('id', '!=', $authId)
+
+            ->when($onlyOnline === 'true', function ($q) use ($onlineLimit) {
+                $q->whereNotNull('is_online')
+                    ->where('is_online', '>=', $onlineLimit);
+            })
 
             ->whereHas('profile', function ($q) use ($request) {
 
@@ -54,26 +65,18 @@ class AdvanceSearchController extends Controller
 
             ->get()
 
-            ->map(function ($user) {
+            ->map(function ($user) use ($onlineLimit) {
+                $user->online_status = $user->is_online && $user->is_online >= $onlineLimit
+                    ? 'online'
+                    : 'offline';
 
-                $user->online = cache()->has('user-is-online-'.$user->id);
-                $user->age = $user->profile ? now()->diffInYears($user->profile->dob) : null;
+                $user->age = $user->profile
+                    ? now()->diffInYears($user->profile->dob)
+                    : null;
 
                 return $user;
-            })
+            });
 
-            ->filter(function ($user) use ($request) {
-                if ($request->online) {
-                    return $user->online;
-                }
-
-                return true;
-            })
-            ->values();
-
-        return response()->json([
-            'status' => true,
-            'data' => $users,
-        ]);
+        return $this->successResponse($users, 'Profiles fetched successfully');
     }
 }

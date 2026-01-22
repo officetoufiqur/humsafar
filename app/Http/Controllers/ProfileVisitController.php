@@ -14,9 +14,10 @@ class ProfileVisitController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
-        $status = $request->query('status');
 
-        $visitors = ProfileVisit::with('visitor')
+        $status = $request->query('online');
+
+        $visitors = ProfileVisit::with('visitor.profile:id,user_id,age,location,relationship,religion,about_me')
             ->where('visited_id', $userId)
             ->latest('visited_at')
             ->get()
@@ -25,18 +26,21 @@ class ProfileVisitController extends Controller
                 $visit = $group->first();
                 $visitor = $visit->visitor;
 
+                $isOnline = cache()->has('user-is-online-'.$visitor->id);
+
                 return [
                     'visitor' => $visitor,
-                    'online' => cache()->has('user-is-online-'.$visit->visitor->id),
+                    'online_status' => $isOnline ? 'online' : 'offline',
                     'visited_at' => $visit->visited_at,
                 ];
             })
             ->filter(function ($user) use ($status) {
-                if ($status === 'active') {
-                    return $user['online'];
+                if ($status === 'true') {
+                    return $user['online_status'] === 'online';
                 }
-                if ($status === 'inactive') {
-                    return ! $user['online'];
+
+                if ($status === 'false') {
+                    return $user['online_status'] === 'offline';
                 }
 
                 return true;

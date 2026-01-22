@@ -25,7 +25,7 @@ class FrontendSettingController extends Controller
 
         $slug = $request->query('slug');
 
-        return $this->successResponse($frontendSetting, 'Frontend Setting', ['slug' => $slug]);
+        return $this->successResponse($frontendSetting, 'Frontend Setting');
     }
 
     public function update(Request $request, $id)
@@ -80,7 +80,7 @@ class FrontendSettingController extends Controller
             $frontendSetting->save();
 
             return $this->successResponse($frontendSetting, 'Contact Settings Updated Successfully');
-        } elseif ($slug === 'term-and-conditions') {
+        } elseif ($slug === 'terms-and-conditions') {
             $request->validate([
                 'title' => 'required|string',
                 'link' => 'required|string',
