@@ -26,6 +26,13 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared successfully!';
 });
 
+Route::get('/storage', function () {
+    Artisan::call('storage:link');
+
+    return 'Storage linked successfully!';
+});
+
+
 Route::get('/', function () {
     return Inertia::render('Home', [
         'canRegister' => Features::enabled(Features::registration()),

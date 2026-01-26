@@ -28,8 +28,8 @@ class DashboardController extends Controller
     public function membersYouMayLike(Request $request)
     {
         $user = Auth::user();
-        $pref = LookingFor::where('user_id', $user->id)->first();
 
+        $pref = LookingFor::where('user_id', $user->id)->first();
         if (! $pref) {
             return response()->json([
                 'status' => false,
@@ -37,51 +37,43 @@ class DashboardController extends Controller
             ]);
         }
 
-        $ageMin = 18;
-        $ageMax = 80;
+        [$ageMin, $ageMax] = $pref->looking_age_range
+            ? array_map('intval', explode('-', $pref->looking_age_range))
+            : [18, 80];
 
-        if ($pref->looking_age_range) {
-            [$ageMin, $ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
-        }
-
-        $query = User::with('profile')
+        $users = User::with('profile')
             ->where('id', '!=', $user->id)
-
             ->whereHas('profile', function ($q) use ($pref, $ageMin, $ageMax) {
 
                 if ($pref->looking_gender) {
-                    $q->where('gender', $pref->looking_gender);
+                    $q->whereRaw(
+                        'LOWER(gender) = ?',
+                        [strtolower($pref->looking_gender)]
+                    );
                 }
+
+                $q->whereBetween('age', [$ageMin, $ageMax]);
 
                 if ($pref->looking_religion) {
                     $q->where('religion', $pref->looking_religion);
                 }
 
-                if ($pref->looking_location) {
-                    $q->where('location', $pref->looking_location);
+                if ($pref->looking_relationship) {
+                    $q->where('relationship', $pref->looking_relationship);
                 }
 
-                if ($pref->looking_education) {
-                    $q->where('education', $pref->looking_education);
-                }
-
-                $q->whereBetween('dob', [
-                    now()->subYears($ageMax),
-                    now()->subYears($ageMin),
-                ]);
             })
-
             ->inRandomOrder()
             ->limit(12)
             ->get()
-
             ->map(function ($u) {
-                $u->online = cache()->has('user-is-online-'.$u->id);
-                $u->age = $u->profile ? now()->diffInYears($u->profile->dob) : null;
+                $u->online_status = cache()->has('user-is-online-'.$u->id)
+                    ? 'online'
+                    : 'offline';
 
                 return $u;
             });
 
-        return $this->successResponse($query, 'Members you may like');
+        return $this->successResponse($users, 'Members you may like');
     }
 }

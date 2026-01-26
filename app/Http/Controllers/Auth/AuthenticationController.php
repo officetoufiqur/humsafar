@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -119,76 +120,77 @@ class AuthenticationController extends Controller
     {
         $validated = $request->validated();
 
-        // $file = null;
-        // if ($request->hasFile('photo')) {
-        //     $file = FileUpload::storeFile($request->file('photo'), 'uploads/users');
-        // }
-
         $user = Auth::user();
 
         if (! $user) {
             return $this->errorResponse('User not found', 404);
         }
 
-        $user->dob = $validated['dob'];
-        $user->photo = $validated['photo'];
-        $user->is_accept = $validated['is_accept'];
-        $user->is_permission = $validated['is_permission'];
-        $user->is_complete = 1;
-        $user->save();
+        DB::transaction(function () use ($validated, $user, &$profile, &$lookingFor) {
 
-        // Create profile
-        $profile = Profile::where('user_id', $user->id)->first();
-        $profile->update([
-            'gender' => $validated['gender'],
-            'origin' => $validated['origin'],
-            'age' => $validated['age'],
-            'looking_for' => $validated['looking_for'],
-            'relationship' => $validated['relationship'],
-            'children' => $validated['children'],
-            'religion' => $validated['religion'],
-            'hair_color' => $validated['hair_color'],
-            'eye_color' => $validated['eye_color'],
-            'body_type' => $validated['body_type'],
-            'appearance' => $validated['appearance'],
-            'intelligence' => $validated['intelligence'],
-            'clothing' => $validated['clothing'],
-            'mother_tongue' => $validated['mother_tongue'],
-            'known_language' => $validated['known_language'],
-            'weight' => $validated['weight'],
-            'height' => $validated['height'],
-            'education' => $validated['education'],
-            'career' => $validated['career'],
-            'about_me' => $validated['about_me'],
-            'sports' => $validated['sports'],
-            'music' => $validated['music'],
-            'cooking' => $validated['cooking'],
-            'reading' => $validated['reading'],
-            'tv_shows' => $validated['tv_shows'],
-            'personal_attitude' => $validated['personal_attitude'],
-            'smoke' => $validated['smoke'],
-            'drinking' => $validated['drinking'],
-            'going_out' => $validated['going_out'],
-        ]);
+            $user->update([
+                'dob' => $validated['dob'] ?? null,
+                'photo' => $validated['photo'] ?? null,
+                'is_accept' => $validated['is_accept'] ?? false,
+                'is_permission' => $validated['is_permission'] ?? false,
+                'is_complete' => 1,
+            ]);
 
-        // Create LookingFor
-        $lookingFor = LookingFor::where('user_id', $user->id)->first();
-        $lookingFor->update([
-            'looking_gender' => $validated['looking_gender'],
-            'looking_origin' => $validated['looking_origin'],
-            'looking_relationship' => $validated['looking_relationship'],
-            'looking_religion' => $validated['looking_religion'],
-            'looking_age_range' => $validated['looking_age_range'],
-            'looking_height' => $validated['looking_height'],
-            'looking_weight' => $validated['looking_weight'],
-            'looking_education' => $validated['looking_education'],
-            'looking_children' => $validated['looking_children'],
-            'looking_smoke' => $validated['looking_smoke'],
-            'looking_drinking' => $validated['looking_drinking'],
-            'looking_going_out' => $validated['looking_going_out'],
-            'looking_location' => $validated['looking_location'],
-            'looking_distance_km' => $validated['looking_distance_km'],
-        ]);
+            $profile = Profile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'gender' => $validated['gender'] ?? null,
+                    'origin' => $validated['origin'] ?? null,
+                    'age' => $validated['age'] ?? null,
+                    'looking_for' => $validated['looking_for'] ?? null,
+                    'relationship' => $validated['relationship'] ?? null,
+                    'children' => $validated['children'] ?? null,
+                    'religion' => $validated['religion'] ?? null,
+                    'hair_color' => $validated['hair_color'] ?? null,
+                    'eye_color' => $validated['eye_color'] ?? null,
+                    'body_type' => $validated['body_type'] ?? null,
+                    'appearance' => $validated['appearance'] ?? null,
+                    'intelligence' => $validated['intelligence'] ?? null,
+                    'clothing' => $validated['clothing'] ?? null,
+                    'mother_tongue' => $validated['mother_tongue'] ?? null,
+                    'known_language' => $validated['known_language'] ?? null,
+                    'weight' => $validated['weight'] ?? null,
+                    'height' => $validated['height'] ?? null,
+                    'education' => $validated['education'] ?? null,
+                    'career' => $validated['career'] ?? null,
+                    'about_me' => $validated['about_me'] ?? null,
+                    'sports' => $validated['sports'] ?? [],
+                    'music' => $validated['music'] ?? [],
+                    'cooking' => $validated['cooking'] ?? [],
+                    'reading' => $validated['reading'] ?? [],
+                    'tv_shows' => $validated['tv_shows'] ?? [],
+                    'personal_attitude' => $validated['personal_attitude'] ?? [],
+                    'smoke' => $validated['smoke'] ?? null,
+                    'drinking' => $validated['drinking'] ?? null,
+                    'going_out' => $validated['going_out'] ?? null,
+                ]
+            );
+
+            $lookingFor = LookingFor::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'looking_gender' => $validated['looking_gender'] ?? null,
+                    'looking_origin' => $validated['looking_origin'] ?? null,
+                    'looking_relationship' => $validated['looking_relationship'] ?? null,
+                    'looking_religion' => $validated['looking_religion'] ?? null,
+                    'looking_age_range' => $validated['looking_age_range'] ?? null,
+                    'looking_height' => $validated['looking_height'] ?? null,
+                    'looking_weight' => $validated['looking_weight'] ?? null,
+                    'looking_education' => $validated['looking_education'] ?? null,
+                    'looking_children' => $validated['looking_children'] ?? null,
+                    'looking_smoke' => $validated['looking_smoke'] ?? null,
+                    'looking_drinking' => $validated['looking_drinking'] ?? null,
+                    'looking_going_out' => $validated['looking_going_out'] ?? null,
+                    'looking_location' => $validated['looking_location'] ?? null,
+                    'looking_distance_km' => $validated['looking_distance_km'] ?? null,
+                ]
+            );
+        });
 
         $user = array_merge(
             $user->toArray(),

@@ -160,7 +160,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/members-you-may-like', 'membersYouMayLike');
     });
 
-
     Route::controller(ComplaintController::class)->group(function () {
         Route::get('/complaints', 'index');
         Route::get('/complaints/{id}', 'show');
@@ -186,11 +185,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/frontends/setting', 'index');
         Route::get('/frontends/setting/edit/{id}', 'edit');
         Route::post('/frontends/setting/update/{id}', 'update');
+        Route::get('/frontends/setting/all', 'howItWorks');
     });
 
     Route::controller(NotificationConteoller::class)->group(function () {
         Route::get('/user/notifications/received', 'getReceivedNotifications');
-        Route::post('/user/link/{id}', 'userLike');
+        Route::post('/user/like/{id}', 'userLike');
     });
 
 });
@@ -206,4 +206,10 @@ Route::controller(BlogController::class)->group(function () {
 
 Route::controller(FaqController::class)->group(function () {
     Route::get('/faqs', 'index');
+});
+
+Route::get('/message', [ChatController::class, 'message']);
+
+Route::controller(FrontendSettingController::class)->group(function () {
+    Route::get('/frontends/setting/all', 'howItWorks');
 });

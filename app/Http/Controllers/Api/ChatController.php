@@ -61,4 +61,12 @@ class ChatController extends Controller
 
         return $this->successResponse($msg, 'Message sent successfully');
     }
+
+    public function message()
+    {
+        $msg = "hello";
+        broadcast(new ChatMessageSent($msg))->toOthers();
+
+        return $this->successResponse($msg, 'Message sent successfully');
+    }
 }

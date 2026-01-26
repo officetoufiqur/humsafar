@@ -14,7 +14,7 @@ class FrontendSettingController extends Controller
 
     public function index()
     {
-        $frontendSettings = FrontendSetting::select('id', 'page_name', 'slug', 'url', 'is_active')->get();
+        $frontendSettings = FrontendSetting::get();
 
         return $this->successResponse($frontendSettings, 'Frontend Settings');
     }
@@ -33,7 +33,88 @@ class FrontendSettingController extends Controller
         $frontendSetting = FrontendSetting::findOrFail($id);
         $slug = $request->query('slug');
 
-        if ($slug === 'contact') {
+        if ($slug === 'home') {
+            $request->validate([
+                'title' => 'nullable|string|max:255',
+                'subtitle' => 'nullable|string|max:255',
+                'faq_title' => 'nullable|string|max:255',
+                'faq_subtitle' => 'nullable|string|max:255',
+                'faq_description' => 'nullable|string',
+                'faq_title1' => 'nullable|string|max:255',
+                'faq_title2' => 'nullable|string|max:255',
+                'faq_title3' => 'nullable|string|max:255',
+                'faq_subtitle1' => 'nullable|string|max:255',
+                'faq_subtitle2' => 'nullable|string|max:255',
+                'faq_subtitle3' => 'nullable|string|max:255',
+                'dating_title' => 'nullable|string|max:255',
+                'dating_subtitle' => 'nullable|string|max:255',
+                'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'dating_image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'dating_image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'dating_image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'dating_image4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ]);
+
+            $existingData = is_array($frontendSetting->content)
+                ? $frontendSetting->content
+                : json_decode($frontendSetting->content, true);
+
+            $bannerImage = $existingData['banner_image'] ?? null;
+            $datingImage1 = $existingData['dating_image1'] ?? null;
+            $datingImage2 = $existingData['dating_image2'] ?? null;
+            $datingImage3 = $existingData['dating_image3'] ?? null;
+            $datingImage4 = $existingData['dating_image4'] ?? null;
+
+            if ($request->hasFile('banner_image')) {
+                $bannerImage = FileUpload::updateFile($request->file('banner_image'), 'uploads/frontend_settings', $bannerImage);
+            }
+
+            if ($request->hasFile('dating_image1')) {
+                $datingImage1 = FileUpload::updateFile($request->file('dating_image1'), 'uploads/frontend_settings', $datingImage1);
+            }
+
+            if ($request->hasFile('dating_image2')) {
+                $datingImage2 = FileUpload::updateFile($request->file('dating_image2'), 'uploads/frontend_settings', $datingImage2);
+            }
+
+            if ($request->hasFile('dating_image3')) {
+                $datingImage3 = FileUpload::updateFile($request->file('dating_image3'), 'uploads/frontend_settings', $datingImage3);
+            }
+
+            if ($request->hasFile('dating_image4')) {
+                $datingImage4 = FileUpload::updateFile($request->file('dating_image4'), 'uploads/frontend_settings', $datingImage4);
+            }
+
+            $data = [
+                'title' => $request->title,
+                'subtitle' => $request->subtitle,
+                'banner_image' => $bannerImage,
+                'faq_title' => $request->faq_title,
+                'faq_subtitle' => $request->faq_subtitle,
+                'faq_description' => $request->faq_description,
+                'faq_title1' => $request->faq_title1,
+                'faq_title2' => $request->faq_title2,
+                'faq_title3' => $request->faq_title3,
+                'faq_subtitle1' => $request->faq_subtitle1,
+                'faq_subtitle2' => $request->faq_subtitle2,
+                'faq_subtitle3' => $request->faq_subtitle3,
+                'dating_title' => $request->dating_title,
+                'dating_subtitle' => $request->dating_subtitle,
+                'dating_image1' => $datingImage1,
+                'dating_image2' => $datingImage2,
+                'dating_image3' => $datingImage3,
+                'dating_image4' => $datingImage4,
+            ];
+
+            $frontendSetting->content = $data;
+            $frontendSetting->save();
+
+            return $this->successResponse(
+                $frontendSetting,
+                'Frontend Setting'
+            );
+
+        } elseif ($slug === 'contact') {
             $request->validate([
                 'contact_name' => 'nullable|string|max:255',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -80,6 +161,72 @@ class FrontendSettingController extends Controller
             $frontendSetting->save();
 
             return $this->successResponse($frontendSetting, 'Contact Settings Updated Successfully');
+        } elseif ($slug === 'how-works') {
+            $request->validate([
+                'work_title' => 'nullable|string',
+                'title' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'description' => 'nullable|string',
+                'step' => 'nullable|string',
+                'step_title' => 'nullable|string',
+                'step_subtitle' => 'nullable|string',
+                'step_description' => 'nullable|string',
+                'step_title1' => 'nullable|string',
+                'step_title2' => 'nullable|string',
+                'step_title3' => 'nullable|string',
+                'step_subtitle1' => 'nullable|string',
+                'step_subtitle2' => 'nullable|string',
+                'step_subtitle3' => 'nullable|string',
+                'faq_title1' => 'nullable|string',
+                'faq_title2' => 'nullable|string',
+                'faq_title3' => 'nullable|string',
+                'faq_title4' => 'nullable|string',
+                'faq_value1' => 'nullable|string',
+                'faq_value2' => 'nullable|string',
+                'faq_value3' => 'nullable|string',
+                'faq_value4' => 'nullable|string',
+            ]);
+
+            $existingData = is_array($frontendSetting->content)
+                ? $frontendSetting->content
+                : json_decode($frontendSetting->content, true);
+
+            $imagePath = $existingData['image'] ?? null;
+
+            if ($request->hasFile('image')) {
+                $imagePath = FileUpload::updateFile($request->file('image'), 'uploads/frontend_settings', $imagePath);
+            }
+
+            $data = [
+                'work_title' => $request->work_title,
+                'title' => $request->title,
+                'image' => $imagePath,
+                'description' => $request->description,
+                'step' => $request->step,
+                'step_title' => $request->step_title,
+                'step_subtitle' => $request->step_subtitle,
+                'step_description' => $request->step_description,
+                'step_title1' => $request->step_title1,
+                'step_title2' => $request->step_title2,
+                'step_title3' => $request->step_title3,
+                'step_subtitle1' => $request->step_subtitle1,
+                'step_subtitle2' => $request->step_subtitle2,
+                'step_subtitle3' => $request->step_subtitle3,
+                'faq_title1' => $request->faq_title1,
+                'faq_title2' => $request->faq_title2,
+                'faq_title3' => $request->faq_title3,
+                'faq_title4' => $request->faq_title4,
+                'faq_value1' => $request->faq_value1,
+                'faq_value2' => $request->faq_value2,
+                'faq_value3' => $request->faq_value3,
+                'faq_value4' => $request->faq_value4,
+            ];
+
+            $frontendSetting->content = $data;
+            $frontendSetting->save();
+
+            return $this->successResponse($frontendSetting, 'How It Works Settings Updated Successfully');
+
         } elseif ($slug === 'terms-and-conditions') {
             $request->validate([
                 'title' => 'required|string',
@@ -141,6 +288,12 @@ class FrontendSettingController extends Controller
                 'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
+            $bannerImage = $frontendSetting->banner_image;
+
+            if ($request->hasFile('banner_image')) {
+                $bannerImage = FileUpload::updateFile($request->file('banner_image'), 'uploads/frontend_settings', $frontendSetting->banner_image);
+            }
+
             $data = [
                 'create' => $request->create,
                 'details' => $request->details,
@@ -151,12 +304,9 @@ class FrontendSettingController extends Controller
                 'partner' => $request->partner,
                 'profile' => $request->profile,
                 'varification' => $request->varification,
+                'banner_image' => $bannerImage,
             ];
 
-            if ($request->hasFile('banner_image')) {
-                $imagePath = FileUpload::updateFile($request->file('banner_image'), 'uploads/frontend_settings', $frontendSetting->banner_image);
-                $frontendSetting->banner_image = $imagePath;
-            }
             $frontendSetting->content = $data;
             $frontendSetting->save();
 
@@ -164,5 +314,18 @@ class FrontendSettingController extends Controller
         }
 
         return $this->errorResponse('Invalid Slug', 400);
+    }
+
+    public function howItWorks(Request $request)
+    {
+        $slug = $request->query('slug');
+
+        $frontendSetting = FrontendSetting::where('slug', $slug)->first();
+
+        if (! $frontendSetting) {
+            return $this->errorResponse('Invalid Slug', 400);
+        }
+
+        return $this->successResponse($frontendSetting, 'Page data');
     }
 }

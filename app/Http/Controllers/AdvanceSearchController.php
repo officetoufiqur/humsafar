@@ -33,34 +33,47 @@ class AdvanceSearchController extends Controller
                 }
 
                 if ($request->relation_status) {
-                    $q->where('relation_status', $request->relation_status);
+                    $q->where('relationship', $request->relation_status);
                 }
 
                 if ($request->country) {
                     $q->where('country', 'like', '%'.$request->country.'%');
                 }
 
+                if ($request->location) {
+                    $q->where('location', 'like', '%'.$request->location.'%');
+                }
+
                 if ($request->from_age && $request->to_age) {
-                    $from = now()->subYears($request->to_age);
-                    $to = now()->subYears($request->from_age);
-                    $q->whereBetween('dob', [$from, $to]);
+                    $q->whereBetween('age', [
+                        $request->from_age,
+                        $request->to_age,
+                    ]);
                 }
 
                 if ($request->religion) {
                     $q->where('religion', $request->religion);
                 }
 
-                if ($request->children) {
+                if ($request->has('children')) {
                     $q->where('children', $request->children);
                 }
 
                 if ($request->education) {
                     $q->where('education', $request->education);
                 }
+
             })
 
             ->when($request->search, function ($q) use ($request) {
-                $q->where('fname', 'like', '%'.$request->search.'%');
+                $q->where(function ($query) use ($request) {
+                    $query->where('fname', 'like', '%'.$request->search.'%')
+                        ->orWhere('lname', 'like', '%'.$request->search.'%')
+                        ->orWhereRaw(
+                            "CONCAT(fname, ' ', lname) LIKE ?",
+                            ['%'.$request->search.'%']
+                        );
+                });
             })
 
             ->get()
