@@ -26,7 +26,7 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared successfully!';
 });
 
-Route::get('/storage', function () {
+Route::get('/storage-path', function () {
     Artisan::call('storage:link');
 
     return 'Storage linked successfully!';

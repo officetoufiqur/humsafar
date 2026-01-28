@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Helpers\FileUpload;
 use App\Models\FrontendSetting;
 use App\Models\Seo;
+use App\Models\User;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FrontendSettingController extends Controller
 {
@@ -327,5 +329,22 @@ class FrontendSettingController extends Controller
         }
 
         return $this->successResponse($frontendSetting, 'Page data');
+    }
+
+    public function dating()
+    {
+        $user = Auth::user();
+
+        $query = User::with('profile:id,user_id,location')
+            ->select('id', 'fname', 'lname', 'photo')
+            ->latest();
+
+        if ($user) {
+            $query->where('id', '!=', $user->id);
+        }
+
+        $users = $query->take(4)->get();
+
+        return $this->successResponse($users, 'Dating');
     }
 }

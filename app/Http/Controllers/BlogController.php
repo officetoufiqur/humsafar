@@ -89,7 +89,7 @@ class BlogController extends Controller
 
     public function getBlogs()
     {
-        $blog = Blog::with('seo')->get();
+        $blog = Blog::with('seo')->latest()->get();
         return $this->successResponse($blog, 'Blogs fetched successfully');
     }
 
@@ -223,5 +223,11 @@ class BlogController extends Controller
         $blog->delete();
 
         return $this->successResponse(null, 'Blog deleted successfully');
+    }
+
+    public function blogDetails($id)
+    {
+        $blog = Blog::with('seo')->find($id);
+        return $this->successResponse($blog, 'Blog fetched successfully');
     }
 }

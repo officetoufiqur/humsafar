@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ChatSettingController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
@@ -169,6 +170,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/complaints/dismiss/{id}', 'updateDismiss');
     });
 
+    Route::get('/chat/messages', [ChatController::class, 'getChatUsers']);
     Route::get('/chat/messages/{id}', [ChatController::class, 'messages']);
     Route::post('/chat/send/{id}', [ChatController::class, 'send']);
 
@@ -193,6 +195,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/like/{id}', 'userLike');
     });
 
+    Route::controller(ChatSettingController::class)->group(function () {
+        Route::get('/chat/setting', 'index');
+        Route::post('/chat/setting/update', 'update');
+    });
+
 });
 
 Route::controller(WorkController::class)->group(function () {
@@ -202,6 +209,7 @@ Route::controller(WorkController::class)->group(function () {
 Route::controller(BlogController::class)->group(function () {
     Route::get('/blog-category', 'gatCategory');
     Route::get('/blogs', 'getBlogs');
+    Route::get('/blogs/{id}', 'blogDetails');
 });
 
 Route::controller(FaqController::class)->group(function () {
@@ -212,4 +220,5 @@ Route::get('/message', [ChatController::class, 'message']);
 
 Route::controller(FrontendSettingController::class)->group(function () {
     Route::get('/frontends/setting/all', 'howItWorks');
+    Route::get('/frontends/setting/dating', 'dating');
 });
