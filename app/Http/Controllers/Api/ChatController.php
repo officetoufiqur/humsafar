@@ -19,18 +19,20 @@ class ChatController extends Controller
     {
         $authId = Auth::id();
 
-        $users = User::where('id', '!=', $authId)
+        $users = User::with('profile:id,user_id,age,origin,location,gender,about_me,eye_color,hair_color,body_type,religion,relationship,state')->where('id', '!=', $authId)
             ->whereIn('id', function ($query) use ($authId) {
-                $query->selectRaw('
+                $query->selectRaw("
                 CASE 
-                    WHEN sender_id = '.$authId.' THEN receiver_id
+                    WHEN sender_id = $authId THEN receiver_id
                     ELSE sender_id
                 END
-            ')
+            ")
                     ->from('messages')
-                    ->where('sender_id', $authId)
-                    ->orWhere('receiver_id', $authId);
-            })->latest()
+                    ->where(function ($q) use ($authId) {
+                        $q->where('sender_id', $authId)
+                            ->orWhere('receiver_id', $authId);
+                    });
+            })
             ->get();
 
         $users->map(function ($user) use ($authId) {
@@ -48,9 +50,15 @@ class ChatController extends Controller
                 })
                 ->latest()
                 ->first();
+            
+            $user->is_online = $user->isOnline();
 
             return $user;
         });
+
+        $users = $users->sortByDesc(function ($user) {
+            return optional($user->last_message)->created_at;
+        })->values();
 
         return $this->successResponse($users, 'Chat users with last message');
     }

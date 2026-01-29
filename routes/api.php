@@ -17,10 +17,13 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\NotificationConteoller;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\ProfileVisitController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Http\Request;
@@ -200,11 +203,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/chat/setting/update', 'update');
     });
 
+     Route::post('/stripe/checkout',
+        [StripePaymentController::class, 'createPaymentIntent']
+    );
+
+    Route::controller(PaymentController::class)->group(function () {
+        Route::get('/payment', 'index');
+        Route::get('/payment/{id}', 'view');
+    });
+
 });
 
 Route::controller(WorkController::class)->group(function () {
     Route::get('/works', 'index');
 });
+
+Route::post('/stripe/webhook',
+    [StripeWebhookController::class, 'handle']
+);
 
 Route::controller(BlogController::class)->group(function () {
     Route::get('/blog-category', 'gatCategory');

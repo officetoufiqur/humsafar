@@ -39,7 +39,8 @@ class User extends Authenticatable
         'blur_photo',
         'members_send_request',
         'status',
-        'membership_type'
+        'membership_type',
+        'vip_expires_at',
     ];
 
     /**
