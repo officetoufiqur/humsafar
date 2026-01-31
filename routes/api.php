@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CallController;
 use App\Http\Controllers\ChatSettingController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
@@ -210,13 +211,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/chat/setting/update', 'update');
     });
 
-     Route::post('/stripe/checkout',
+    Route::post('/stripe/checkout',
         [StripePaymentController::class, 'createPaymentIntent']
     );
 
     Route::controller(PaymentController::class)->group(function () {
         Route::get('/payment', 'index');
         Route::get('/payment/{id}', 'view');
+    });
+
+    Route::controller(CallController::class)->group(function () {
+        Route::post('/call/start', 'start');
+        Route::post('/call/{call}/accept', 'accept');
+        Route::post('/call/{call}/reject', 'reject');
+        Route::post('/call/{call}/signal', 'signal');
+        Route::post('/call/{call}/end', 'end');
     });
 
 });
