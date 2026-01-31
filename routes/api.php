@@ -194,8 +194,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(NotificationConteoller::class)->group(function () {
-        Route::get('/user/notifications/received', 'getReceivedNotifications');
+        Route::get('/user/notifications/like', 'getLikeNotifications');
         Route::post('/user/like/{id}', 'userLike');
+        Route::get('/user/notifications/connect', 'getConnectNotifications');
+        Route::get('/user/notifications/send', 'getSendNotifications');
+        Route::post('/user/connect/{id}', 'userConnect');
+        Route::get('/user/notifications/received', 'getReceivedNotifications');
+        Route::post('/user/accept/{id}', 'userAccept');
+        Route::get('/user/notifications/trash', 'getDeclinedNotifications');
+        Route::post('/user/decline/{id}', 'userDecline');
     });
 
     Route::controller(ChatSettingController::class)->group(function () {
