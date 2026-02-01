@@ -40,7 +40,7 @@ class CallSignalEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('call.' . $this->callId);
+        return new PrivateChannel('video-call.' . $this->callId);
     }
 
     public function broadcastAs()

@@ -43,5 +43,9 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth'])->name('dashboard');
 
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
+
 require __DIR__.'/settings.php';
 require __DIR__.'/command.php';

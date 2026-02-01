@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('package_id')->constrained('packages')->cascadeOnDelete();
-            $table->string('stripe_payment_intent_id')->unique();
+            $table->string('stripe_payment_intent_id')->nullable()->unique();
             $table->string('tier');
             $table->string('method');
             $table->string('amount');

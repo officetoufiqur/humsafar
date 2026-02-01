@@ -69,6 +69,12 @@ class NotificationConteoller extends Controller
             return $this->errorResponse('Already liked', 409);
         }
 
+        Connect::create([
+            'from_user_id' => $fromUser->id,
+            'to_user_id' => $toUser->id,
+            'status' => 'pending',
+        ]);
+
         $user = User::with('profile')->find($fromUser->id);
 
         $toUser->notify(new UserNotification([
@@ -249,7 +255,7 @@ class NotificationConteoller extends Controller
         $user = Auth::user();
 
         $connect = Connect::with(['fromUser.profile'])
-            ->where('id', $connectId)
+            ->where('from_user_id', $connectId)
             ->where('to_user_id', $user->id)
             ->where('status', 'pending')
             ->first();
@@ -265,7 +271,8 @@ class NotificationConteoller extends Controller
 
         $sender->notify(new UserNotification([
             'type' => 'connect_accepted',
-            'by_user' => [
+            'accepted' => true,
+            'form_user' => [
                 'id' => $user->id,
                 'fname' => $user->fname,
                 'lname' => $user->lname,
@@ -299,9 +306,8 @@ class NotificationConteoller extends Controller
         $data = $notifications->map(function ($notification) {
             return [
                 'notification_id' => $notification->id,
-                'message' => $notification->data['message'] ?? null,
                 'type' => 'connect_accepted',
-                'by_user' => $notification->data['data']['by_user'] ?? null,
+                'from_user' => $notification->data['data']['by_user'] ?? null,
                 'created_at' => $notification->created_at,
                 'read_at' => $notification->read_at,
             ];
@@ -325,7 +331,7 @@ class NotificationConteoller extends Controller
         $user = Auth::user();
 
         $connect = Connect::with(['fromUser.profile'])
-            ->where('id', $connectId)
+            ->where('from_user_id', $connectId)
             ->where('to_user_id', $user->id)
             ->where('status', 'pending')
             ->first();
@@ -341,6 +347,7 @@ class NotificationConteoller extends Controller
 
         $sender->notify(new UserNotification([
             'type' => 'connect_rejected',
+            'accepted' => true,
             'by_user' => [
                 'id' => $user->id,
                 'fname' => $user->fname,

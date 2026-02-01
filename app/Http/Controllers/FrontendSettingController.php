@@ -23,9 +23,51 @@ class FrontendSettingController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $frontendSetting = FrontendSetting::find($id);
+        $frontendSetting = FrontendSetting::with('seo')->find($id);
 
-        $slug = $request->query('slug');
+        if (! $frontendSetting) {
+            return $this->errorResponse('Frontend Setting not found', 404);
+        }
+
+        return $this->successResponse($frontendSetting, 'Frontend Setting');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'page_name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'content' => 'required|array',
+            'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $slug = str_replace(' ', '-', strtolower($request->page_name));
+
+        $content = $request->content;
+        $content['title'] = $request->title;
+
+        $frontendSetting = new FrontendSetting;
+        $frontendSetting->page_name = $request->page_name;
+        $frontendSetting->slug = $slug;
+        $frontendSetting->url = $request->url;
+
+        $frontendSetting->content = $content;
+
+        $frontendSetting->save();
+
+        if ($request->hasFile('meta_image')) {
+            $imagePath = FileUpload::storeFile($request->file('meta_image'), 'uploads/frontend');
+        }
+
+        Seo::create([
+            'frontend_id' => $frontendSetting->id,
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'meta_keywords' => $request->meta_keywords,
+            'page_type' => $request->page_type,
+            'meta_image' => $imagePath,
+        ]);
 
         return $this->successResponse($frontendSetting, 'Frontend Setting');
     }
@@ -313,6 +355,51 @@ class FrontendSettingController extends Controller
             $frontendSetting->save();
 
             return $this->successResponse($frontendSetting, 'Registration Settings Updated Successfully');
+        }elseif ($slug === $frontendSetting->slug) {
+            $request->validate([
+                'title' => 'required|string',
+                'content' => 'required|string',
+            ]);
+
+            $data = [
+                'title' => $request->title,
+                'content' => $request->content,
+            ];
+
+            $frontendSetting->content = $data;
+            $frontendSetting->save();
+
+            $seo = Seo::where('frontend_id', $frontendSetting->id)->first();
+
+            if ($seo) {
+                $seo->meta_title = $request->meta_title;
+                $seo->meta_description = $request->meta_description;
+                $seo->meta_keywords = $request->meta_keywords;
+                $seo->page_type = $request->page_type;
+                $seo->show_header = $request->show_header;
+                if ($request->hasFile('meta_image')) {
+                    $imagePath = FileUpload::updateFile($request->file('meta_image'), 'uploads/seos', $seo->meta_image);
+                    $seo->meta_image = $imagePath;
+                }
+                $seo->save();
+            } else {
+                if ($request->hasFile('meta_image')) {
+                    $imagePath = FileUpload::storeFile($request->file('meta_image'), 'uploads/seos');
+                }
+
+                Seo::create([
+                    'frontend_id' => $frontendSetting->id,
+                    'meta_title' => $request->meta_title,
+                    'meta_description' => $request->meta_description,
+                    'meta_keywords' => $request->meta_keywords,
+                    'page_type' => $request->page_type,
+                    'show_header' => $request->show_header,
+                    'meta_image' => $imagePath,
+                ]);
+
+            }
+
+            return $this->successResponse($frontendSetting, 'Term and Conditions Updated Successfully');
         }
 
         return $this->errorResponse('Invalid Slug', 400);
@@ -346,5 +433,18 @@ class FrontendSettingController extends Controller
         $users = $query->take(4)->get();
 
         return $this->successResponse($users, 'Dating');
+    }
+
+    public function destroy($id)
+    {
+        $frontendSetting = FrontendSetting::find($id);
+
+        if (! $frontendSetting) {
+            return $this->errorResponse('Frontend Setting not found', 404);
+        }
+
+        $frontendSetting->delete();
+
+        return $this->successResponse($frontendSetting, 'Frontend Setting deleted successfully');
     }
 }

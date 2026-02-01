@@ -15,6 +15,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FrontendSettingController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MolliePaymentController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\NotificationConteoller;
 use App\Http\Controllers\PackageController;
@@ -189,9 +190,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(FrontendSettingController::class)->group(function () {
         Route::get('/frontends/setting', 'index');
+        Route::post('/frontends/setting/create', 'store');
         Route::get('/frontends/setting/edit/{id}', 'edit');
         Route::post('/frontends/setting/update/{id}', 'update');
         Route::get('/frontends/setting/all', 'howItWorks');
+        Route::delete('/frontends/setting/{id}', 'destroy');
     });
 
     Route::controller(NotificationConteoller::class)->group(function () {
@@ -228,6 +231,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/call/{call}/end', 'end');
     });
 
+    Route::controller(MolliePaymentController::class)->group(function () {
+        Route::post('/mollie/pay', 'create');
+        Route::post('/mollie/webhook', 'webhook')->name('mollie.webhook');
+        Route::get('/mollie/status/{id}', 'status');
+        Route::get('/mollie/success', 'success');
+        Route::get('/mollie/cancel', 'cancel');
+    });
+
 });
 
 Route::controller(WorkController::class)->group(function () {
@@ -253,4 +264,8 @@ Route::get('/message', [ChatController::class, 'message']);
 Route::controller(FrontendSettingController::class)->group(function () {
     Route::get('/frontends/setting/all', 'howItWorks');
     Route::get('/frontends/setting/dating', 'dating');
+});
+
+Route::controller(MolliePaymentController::class)->group(function () {
+    Route::post('/mollie/webhook', 'webhook')->name('mollie.webhook');
 });

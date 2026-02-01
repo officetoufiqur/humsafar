@@ -20,4 +20,9 @@ class FrontendSetting extends Model
     protected $casts = [
         'content' => 'array',
     ];
+
+    public function seo()
+    {
+        return $this->hasOne(Seo::class, 'frontend_id');
+    }
 }

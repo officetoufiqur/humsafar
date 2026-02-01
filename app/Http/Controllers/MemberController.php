@@ -273,10 +273,10 @@ class MemberController extends Controller
     {
         $user = User::find($id);
 
-        if ($user->status == 1) {
-            $user->status = 0;
+        if ($user->status == "active") {
+            $user->status = "inactive";
         } else {
-            $user->status = 1;
+            $user->status = "active";
         }
 
         $user->save();

@@ -13,6 +13,6 @@ class Seo extends Model
 
     public function frontend()
     {
-        return $this->belongsTo(FrontendSetting::class);
+        return $this->belongsTo(FrontendSetting::class, 'frontend_id');
     }
 }
