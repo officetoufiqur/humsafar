@@ -14,7 +14,7 @@ class TicketController extends Controller
 
     public function index()
     {
-        $tickets = Ticket::with('replies')->get();
+        $tickets = Ticket::get();
 
         if ($tickets->isEmpty()) {
             return $this->errorResponse('No tickets found', 404);
@@ -54,7 +54,7 @@ class TicketController extends Controller
 
     public function show($id)
     {
-        $ticket = Ticket::find($id);
+        $ticket = Ticket::with('replies')->find($id);
 
         if (!$ticket) {
             return $this->errorResponse('Ticket not found', 404);

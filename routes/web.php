@@ -26,6 +26,13 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared successfully!';
 });
 
+Route::get('/storage-path', function () {
+    Artisan::call('storage:link');
+
+    return 'Storage linked successfully!';
+});
+
+
 Route::get('/', function () {
     return Inertia::render('Home', [
         'canRegister' => Features::enabled(Features::registration()),
@@ -35,6 +42,10 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/command.php';

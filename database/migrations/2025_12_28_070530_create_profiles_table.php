@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('origin')->nullable();
             $table->string('looking_for')->nullable();
             $table->string('relationship')->nullable();
-            $table->unsignedTinyInteger('children')->nullable();
+            $table->string('children')->nullable();
             $table->string('religion')->nullable();
             $table->string('location')->nullable();
             $table->string('hair_color')->nullable();
@@ -31,8 +31,9 @@ return new class extends Migration
             $table->string('clothing')->nullable();
             $table->string('mother_tongue')->nullable();
             $table->string('known_language')->nullable();
-            $table->unsignedSmallInteger('weight')->nullable(); 
-            $table->unsignedSmallInteger('height')->nullable();
+            $table->string('language')->nullable();
+            $table->string('weight')->nullable(); 
+            $table->string('height')->nullable();
             $table->string('education')->nullable();
             $table->string('career')->nullable();
             $table->longText('about_me')->nullable();
@@ -45,6 +46,24 @@ return new class extends Migration
             $table->string('smoke')->nullable();
             $table->string('drinking')->nullable();
             $table->string('going_out')->nullable();
+            $table->string('edu_primary')->nullable();
+            $table->string('edu_secondary')->nullable();
+            $table->string('edu_qualification')->nullable();
+            $table->string('experience')->nullable();
+            $table->string('certifications')->nullable();
+            $table->string('department')->nullable();
+            $table->string('position')->nullable();
+            $table->string('exercise')->nullable();
+            $table->string('diet')->nullable();
+            $table->string('pets')->nullable();
+            $table->string('travel')->nullable();
+            $table->string('social_media')->nullable();
+            $table->string('work_life_balance')->nullable();
+            $table->string('night_life')->nullable();
+            $table->string('hobby')->nullable();
+            $table->string('country')->nullable();
+            $table->string('state')->nullable();
+            $table->string('city')->nullable();
 
             $table->timestamps();
         });

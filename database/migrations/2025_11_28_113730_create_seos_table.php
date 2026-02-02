@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('seos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('frontend_id')->nullable()->constrained('frontend_settings')->nullOnDelete();
             $table->string('meta_title');
             $table->text('meta_description');
             $table->string('meta_keywords');
             $table->string('meta_image')->nullable();
+            $table->string('page_type')->nullable();
+            $table->boolean('show_header')->default(false);
             $table->timestamps();
         });
     }

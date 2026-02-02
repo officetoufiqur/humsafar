@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -37,6 +38,9 @@ class User extends Authenticatable
         'vip_members',
         'blur_photo',
         'members_send_request',
+        'status',
+        'membership_type',
+        'vip_expires_at',
     ];
 
     /**
@@ -98,5 +102,17 @@ class User extends Authenticatable
             'blocked_id',
             'blocker_id'
         );
+    }
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-'.$this->id);
+    }
+
+    public function latestMessage()
+    {
+        return $this->hasOne(Message::class, 'sender_id')
+            ->orWhere('receiver_id', $this->id)
+            ->latest();
     }
 }

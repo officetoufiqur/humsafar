@@ -1,17 +1,31 @@
 <?php
 
+use App\Http\Controllers\AdvanceSearchController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CallController;
+use App\Http\Controllers\ChatSettingController;
+use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\FrontendSettingController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MolliePaymentController;
 use App\Http\Controllers\MyProfileController;
+use App\Http\Controllers\NotificationConteoller;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileAttributeController;
+use App\Http\Controllers\ProfileVisitController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Http\Request;
@@ -87,7 +101,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(BannerController::class)->group(function () {
-        Route::post('/news-letters', 'newsLetters');
+        Route::get('/news-letters', 'newsLetters');
+        Route::get('/news-letters/{id}', 'newsLettersView');
+        Route::post('/news-letters', 'newsLetterStore');
+        Route::get('/banners', 'index');
+        Route::post('/banners', 'store');
+        Route::get('/banners/{id}', 'edit');
+        Route::post('/banners/{id}', 'update');
+        Route::get('/banners/{id}', 'view');
+        Route::post('/banners/status/{id}', 'updateStatus');
     });
 
     Route::controller(BlogController::class)->group(function () {
@@ -113,11 +135,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/setting/account/update', 'update');
         Route::post('/setting/update/password', 'updatePassword');
         Route::delete('/setting/delete/account', 'deleteAccount');
+        Route::get('/setting/photo', 'getPhotoSetting');
         Route::post('/setting/photo', 'photoSetting');
         Route::get('/setting/partner', 'getPartnerSetting');
         Route::post('/setting/partner', 'partnerSetting');
         Route::get('/blocked/profile', 'blockedProfile');
-        Route::get('/blocked/profile/details/{id}', 'profileDetails');
+        Route::get('/profile/details/{id}', 'profileDetails');
         Route::post('/blocked/user/{id}', 'blockUser');
         Route::post('/un-blocked/user/{id}', 'unblockUser');
     });
@@ -129,17 +152,120 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/support/tickets/reply/{id}', 'reply');
     });
 
+    Route::controller(ProfileVisitController::class)->group(function () {
+        Route::get('/profile-visit', 'index');
+        Route::post('/profile-visit/{id}', 'store');
+    });
+
+    Route::controller(AdvanceSearchController::class)->group(function () {
+        Route::get('/search-profiles', 'searchProfiles');
+    });
+
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/dashboard', 'index');
+        Route::get('/members-you-may-like', 'membersYouMayLike');
+    });
+
+    Route::controller(ComplaintController::class)->group(function () {
+        Route::get('/complaints', 'index');
+        Route::get('/complaints/{id}', 'show');
+        Route::post('/complaints', 'store');
+        Route::post('/complaints/replay/{id}', 'storeReplay');
+        Route::post('/complaints/block/{id}', 'updateBlock');
+        Route::post('/complaints/dismiss/{id}', 'updateDismiss');
+    });
+
+    Route::get('/chat/messages', [ChatController::class, 'getChatUsers']);
+    Route::get('/chat/messages/{id}', [ChatController::class, 'messages']);
+    Route::post('/chat/send/{id}', [ChatController::class, 'send']);
+
+    Route::controller(MemberController::class)->group(function () {
+        Route::get('/members', 'index');
+        Route::get('/members/view/{id}', 'view');
+        Route::post('/members', 'store');
+        Route::post('/members/{id}', 'update');
+        Route::post('/members/status/{id}', 'statusUpdate');
+        Route::delete('/members/{id}', 'destroy');
+    });
+
+    Route::controller(FrontendSettingController::class)->group(function () {
+        Route::get('/frontends/setting', 'index');
+        Route::post('/frontends/setting/create', 'store');
+        Route::get('/frontends/setting/edit/{id}', 'edit');
+        Route::post('/frontends/setting/update/{id}', 'update');
+        Route::get('/frontends/setting/all', 'howItWorks');
+        Route::delete('/frontends/setting/{id}', 'destroy');
+    });
+
+    Route::controller(NotificationConteoller::class)->group(function () {
+        Route::get('/user/notifications/like', 'getLikeNotifications');
+        Route::post('/user/like/{id}', 'userLike');
+        Route::get('/user/notifications/connect', 'getConnectNotifications');
+        Route::get('/user/notifications/send', 'getSendNotifications');
+        Route::post('/user/connect/{id}', 'userConnect');
+        Route::get('/user/notifications/received', 'getReceivedNotifications');
+        Route::post('/user/accept/{id}', 'userAccept');
+        Route::get('/user/notifications/trash', 'getDeclinedNotifications');
+        Route::post('/user/decline/{id}', 'userDecline');
+    });
+
+    Route::controller(ChatSettingController::class)->group(function () {
+        Route::get('/chat/setting', 'index');
+        Route::post('/chat/setting/update', 'update');
+    });
+
+    Route::post('/stripe/checkout',
+        [StripePaymentController::class, 'createPaymentIntent']
+    );
+
+    Route::controller(PaymentController::class)->group(function () {
+        Route::get('/payment', 'index');
+        Route::get('/payment/{id}', 'view');
+    });
+
+    Route::controller(CallController::class)->group(function () {
+        Route::post('/call/start', 'start');
+        Route::post('/call/{call}/accept', 'accept');
+        Route::post('/call/{call}/reject', 'reject');
+        Route::post('/call/{call}/signal', 'signal');
+        Route::post('/call/{call}/end', 'end');
+    });
+
+    Route::controller(MolliePaymentController::class)->group(function () {
+        Route::post('/mollie/pay', 'create');
+        Route::post('/mollie/webhook', 'webhook')->name('mollie.webhook');
+        Route::get('/mollie/status/{id}', 'status');
+        Route::get('/mollie/success', 'success');
+        Route::get('/mollie/cancel', 'cancel');
+    });
+
 });
 
 Route::controller(WorkController::class)->group(function () {
     Route::get('/works', 'index');
 });
 
+Route::post('/stripe/webhook',
+    [StripeWebhookController::class, 'handle']
+);
+
 Route::controller(BlogController::class)->group(function () {
     Route::get('/blog-category', 'gatCategory');
     Route::get('/blogs', 'getBlogs');
+    Route::get('/blogs/{id}', 'blogDetails');
 });
 
 Route::controller(FaqController::class)->group(function () {
     Route::get('/faqs', 'index');
+});
+
+Route::get('/message', [ChatController::class, 'message']);
+
+Route::controller(FrontendSettingController::class)->group(function () {
+    Route::get('/frontends/setting/all', 'howItWorks');
+    Route::get('/frontends/setting/dating', 'dating');
+});
+
+Route::controller(MolliePaymentController::class)->group(function () {
+    Route::post('/mollie/webhook', 'webhook')->name('mollie.webhook');
 });

@@ -26,12 +26,16 @@ class MatchController extends Controller
 
         $ageMin = 0;
         $ageMax = 100;
+
         if ($pref->looking_age_range) {
-            [$ageMin,$ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
+            [$ageMin, $ageMax] = array_map('intval', explode('-', $pref->looking_age_range));
         }
 
+        $blockedIds = $user->blockedUsers()->pluck('users.id');
+
         $query = Profile::join('users', 'users.id', '=', 'profiles.user_id')
-            ->where('profiles.user_id', '!=', $user->id);
+            ->where('profiles.user_id', '!=', $user->id)
+            ->whereNotIn('profiles.user_id', $blockedIds);
 
         if ($onlyOnline === 'true') {
             $query->whereNotNull('users.is_online')
@@ -40,6 +44,11 @@ class MatchController extends Controller
 
         $query->selectRaw('
         profiles.*,
+        users.photo,
+        users.fname,
+        users.lname,
+        users.display_name,
+        profiles.location as profile_location,
 
         (
             (CASE WHEN religion = ? THEN 25 ELSE 0 END) +
