@@ -10,6 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class CallSignalEvent implements ShouldBroadcastNow
 {
@@ -19,18 +20,19 @@ class CallSignalEvent implements ShouldBroadcastNow
      * Create a new event instance.
      */
 
-    public $callId;
-    public $form;
-    public $data;
-    public $type;
+    // public $callId;
+    // public $form;
+    // public $to;
+    // public $data;
+    // public $type;
 
-    
-    public function __construct($callId, $form, $type, $data = [])
-    {
-        $this->callId = $callId;
-        $this->form = $form;
-        $this->data = $data;
-        $this->type = $type;
+
+    public function __construct(
+        public int $from,
+        public int $to,
+        public string $type,
+        public array $payload
+    ) {
     }
 
     /**
@@ -40,7 +42,8 @@ class CallSignalEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('video-call.' . $this->callId);
+        // Log::info('data = ' . $this->data);
+        return new PrivateChannel('video-call.' . $this->to);
     }
 
     public function broadcastAs()

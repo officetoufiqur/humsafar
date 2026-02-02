@@ -31,7 +31,8 @@ class CallController extends Controller
 
         broadcast(new CallSignalEvent(
             $call->id,
-            Auth::id(),
+            $call->caller_id,
+            $call->receiver_id,
             'incoming_call',
             $call
         ))->toOthers();
@@ -50,7 +51,8 @@ class CallController extends Controller
 
         broadcast(new CallSignalEvent(
             $call->id,
-            Auth::id(),
+            $call->caller_id,
+            $call->receiver_id,
             'accepted',
             $call
         ))->toOthers();
@@ -69,7 +71,8 @@ class CallController extends Controller
 
         broadcast(new CallSignalEvent(
             $call->id,
-            Auth::id(),
+            $call->caller_id,
+            $call->receiver_id,
             'rejected',
             $call
         ))->toOthers();
@@ -83,7 +86,8 @@ class CallController extends Controller
 
         broadcast(new CallSignalEvent(
             $call->id,
-            Auth::id(),
+            $call->caller_id,
+            $call->receiver_id,
             $request->type, 
             $request->data
         ))->toOthers();
@@ -102,7 +106,8 @@ class CallController extends Controller
 
         broadcast(new CallSignalEvent(
             $call->id,
-            Auth::id(),
+            $call->caller_id,
+            $call->receiver_id,
             'ended',
             $call
         ))->toOthers();
