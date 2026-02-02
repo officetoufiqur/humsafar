@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,12 +12,10 @@ return new class extends Migration
     {
         Schema::create('calls', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('caller_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('receiver_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('caller_id')->constrained('users');
+            $table->foreignId('receiver_id')->constrained('users');
             $table->enum('type', ['audio', 'video']);
-            $table->enum('status', ['ringing', 'accepted', 'rejected', 'ended'])->default('ringing');
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('ended_at')->nullable();
+            $table->enum('status', ['ringing', 'accepted', 'ended'])->default('ringing');
             $table->timestamps();
         });
     }

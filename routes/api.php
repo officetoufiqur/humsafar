@@ -214,7 +214,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/chat/setting/update', 'update');
     });
 
-    Route::post('/stripe/checkout',
+    Route::post(
+        '/stripe/checkout',
         [StripePaymentController::class, 'createPaymentIntent']
     );
 
@@ -223,13 +224,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payment/{id}', 'view');
     });
 
-    Route::controller(CallController::class)->group(function () {
-        Route::post('/call/start', 'start');
-        Route::post('/call/{call}/accept', 'accept');
-        Route::post('/call/{call}/reject', 'reject');
-        Route::post('/call/{call}/signal', 'signal');
-        Route::post('/call/{call}/end', 'end');
+    // routes/api.php
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/calls/start', [CallController::class, 'start']);
+        Route::post('/calls/signal', [CallController::class, 'signal']);
     });
+
 
     Route::controller(MolliePaymentController::class)->group(function () {
         Route::post('/mollie/pay', 'create');
@@ -245,7 +245,8 @@ Route::controller(WorkController::class)->group(function () {
     Route::get('/works', 'index');
 });
 
-Route::post('/stripe/webhook',
+Route::post(
+    '/stripe/webhook',
     [StripeWebhookController::class, 'handle']
 );
 

@@ -3,122 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Events\CallSignalEvent;
+use App\Events\WebRtcSignalEvent;
 use App\Models\Call;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// app/Http/Controllers/CallController.php
 class CallController extends Controller
 {
-    use ApiResponse;
-
-     public function start(Request $request)
+    public function start(Request $request)
     {
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
             'type' => 'required|in:audio,video',
         ]);
 
-        if ($request->receiver_id == Auth::id()) {
-            return response()->json(['message' => 'Cannot call yourself'], 403);
-        }
-
         $call = Call::create([
-            'caller_id' => Auth::id(),
+            'caller_id' => auth()->id(),
             'receiver_id' => $request->receiver_id,
             'type' => $request->type,
         ]);
 
-        broadcast(new CallSignalEvent(
-            $call->id,
-            $call->caller_id,
-            $call->receiver_id,
+        broadcast(new WebRtcSignalEvent(
+            auth()->id(),
+            $request->receiver_id,
             'incoming_call',
-            $call
+            ['call' => $call]
         ))->toOthers();
 
-        return $this->successResponse($call, 'Call started');
+        return response()->json($call);
     }
 
-    public function accept(Call $call)
+    public function signal(Request $request)
     {
-        $this->authorizeCall($call);
-
-        $call->update([
-            'status' => 'accepted',
-            'started_at' => now(),
+        $request->validate([
+            'to' => 'required|exists:users,id',
+            'type' => 'required|string',
+            'payload' => 'required|array',
         ]);
 
-        broadcast(new CallSignalEvent(
-            $call->id,
-            $call->caller_id,
-            $call->receiver_id,
-            'accepted',
-            $call
+        broadcast(new WebRtcSignalEvent(
+            auth()->id(),
+            $request->to,
+            $request->type,
+            $request->payload
         ))->toOthers();
 
-        return response()->json(['message' => 'Call accepted']);
-    }
-
-    public function reject(Call $call)
-    {
-        $this->authorizeCall($call);
-
-        $call->update([
-            'status' => 'rejected',
-            'ended_at' => now(),
-        ]);
-
-        broadcast(new CallSignalEvent(
-            $call->id,
-            $call->caller_id,
-            $call->receiver_id,
-            'rejected',
-            $call
-        ))->toOthers();
-
-        return response()->json(['message' => 'Call rejected']);
-    }
-
-    public function signal(Request $request, Call $call)
-    {
-        $this->authorizeCall($call);
-
-        broadcast(new CallSignalEvent(
-            $call->id,
-            $call->caller_id,
-            $call->receiver_id,
-            $request->type, 
-            $request->data
-        ))->toOthers();
-
-        return response()->json(['status' => 'sent']);
-    }
-
-    public function end(Call $call)
-    {
-        $this->authorizeCall($call);
-
-        $call->update([
-            'status' => 'ended',
-            'ended_at' => now(),
-        ]);
-
-        broadcast(new CallSignalEvent(
-            $call->id,
-            $call->caller_id,
-            $call->receiver_id,
-            'ended',
-            $call
-        ))->toOthers();
-
-        return response()->json(['message' => 'Call ended']);
-    }
-
-    private function authorizeCall(Call $call)
-    {
-        if (!in_array(Auth::id(), [$call->caller_id, $call->receiver_id])) {
-            abort(403);
-        }
+        return response()->json(['ok' => true]);
     }
 }
