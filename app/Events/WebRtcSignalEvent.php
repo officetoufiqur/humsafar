@@ -12,20 +12,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class CallSignalEvent implements ShouldBroadcastNow
+class WebRtcSignalEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    /**
-     * Create a new event instance.
-     */
-
-    // public $callId;
-    // public $form;
-    // public $to;
-    // public $data;
-    // public $type;
-
 
     public function __construct(
         public int $from,
@@ -35,19 +24,13 @@ class CallSignalEvent implements ShouldBroadcastNow
     ) {
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn()
     {
-        // Log::info('data = ' . $this->data);
         return new PrivateChannel('video-call.' . $this->to);
     }
 
     public function broadcastAs()
     {
-        return 'call.signal';
+        return 'webrtc.signal';
     }
 }
