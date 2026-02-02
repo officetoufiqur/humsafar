@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LookingFor;
+use App\Models\MatchUser;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,6 +80,20 @@ class MatchController extends Controller
         $matches = $query->orderByDesc('score')
             ->limit(50)
             ->get();
+
+        if ($matches->isNotEmpty()) {
+            foreach ($matches as $match) {
+                MatchUser::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'matched_user_id' => $match->user_id,
+                    ],
+                    [
+                        'score' => $match->score,
+                    ]
+                );
+            }
+        }
 
         return response()->json([
             'status' => true,

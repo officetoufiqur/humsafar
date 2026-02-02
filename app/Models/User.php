@@ -115,4 +115,9 @@ class User extends Authenticatable
             ->orWhere('receiver_id', $this->id)
             ->latest();
     }
+
+    public function payments()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

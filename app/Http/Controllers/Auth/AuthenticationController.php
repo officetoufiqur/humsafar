@@ -198,6 +198,8 @@ class AuthenticationController extends Controller
             $lookingFor->toArray()
         );
 
+        $admin = User::where('role', 'admin')->first();
+
         return $this->successResponse(
             $user,
             'Registration successful',

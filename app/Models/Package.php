@@ -16,7 +16,7 @@ class Package extends Model
         'description',
         'image',
         'features',
-        'status'
+        'status',
     ];
 
     protected $casts = [
@@ -26,5 +26,10 @@ class Package extends Model
     public function profile()
     {
         return $this->belongsTo(Profile::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

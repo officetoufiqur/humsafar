@@ -357,13 +357,12 @@ class FrontendSettingController extends Controller
             return $this->successResponse($frontendSetting, 'Registration Settings Updated Successfully');
         }elseif ($slug === $frontendSetting->slug) {
             $request->validate([
-                'title' => 'required|string',
-                'content' => 'required|string',
+                'title' => 'required|string'
             ]);
 
             $data = [
+                'body' => $request->content,
                 'title' => $request->title,
-                'content' => $request->content,
             ];
 
             $frontendSetting->content = $data;

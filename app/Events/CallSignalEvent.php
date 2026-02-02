@@ -21,14 +21,16 @@ class CallSignalEvent implements ShouldBroadcastNow
 
     public $callId;
     public $form;
+    public $to;
     public $data;
     public $type;
 
     
-    public function __construct($callId, $form, $type, $data = [])
+    public function __construct($callId, $form, $to, $type, $data = [])
     {
         $this->callId = $callId;
         $this->form = $form;
+        $this->to = $to;
         $this->data = $data;
         $this->type = $type;
     }
@@ -40,7 +42,7 @@ class CallSignalEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('video-call.' . $this->callId);
+        return new PrivateChannel('video-call.' . $this->to);
     }
 
     public function broadcastAs()

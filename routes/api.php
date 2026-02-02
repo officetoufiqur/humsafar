@@ -4,6 +4,7 @@ use App\Http\Controllers\AdvanceSearchController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\BackendDashboardController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CallController;
@@ -164,6 +165,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/dashboard', 'index');
         Route::get('/members-you-may-like', 'membersYouMayLike');
+    });
+
+    Route::controller(BackendDashboardController::class)->group(function () {
+        Route::get('/dashboard/statistics', 'index');
+        Route::get('/dashboard/best-selling', 'bestSelling');
+        Route::get('/dashboard/new-users', 'newUsers');
+        Route::get('/dashboard/performance', 'performance');
+        Route::get('/dashboard/user-stats', 'userStats');
+        Route::get('/dashboard/matching-satisfaction', 'matchingSatisfaction');
     });
 
     Route::controller(ComplaintController::class)->group(function () {

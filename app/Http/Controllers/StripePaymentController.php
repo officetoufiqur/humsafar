@@ -37,7 +37,7 @@ class StripePaymentController extends Controller
             'package_id' => $package->id,
             'stripe_payment_intent_id' => $intent->id,
             'tier' => $package->name,
-            'method' => 'card',
+            'method' => 'stripe',
             'amount' => $amount,
             'currency' => 'usd',
             'status' => 'pending',
