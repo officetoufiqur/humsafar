@@ -229,6 +229,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/call/{call}/reject', 'reject');
         Route::post('/call/{call}/signal', 'signal');
         Route::post('/call/{call}/end', 'end');
+        // 
     });
 
     Route::controller(MolliePaymentController::class)->group(function () {
