@@ -446,4 +446,5 @@ class FrontendSettingController extends Controller
 
         return $this->successResponse($frontendSetting, 'Frontend Setting deleted successfully');
     }
+
 }

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\GenerateNumber;
+use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\UserNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,8 +62,7 @@ class StripeWebhookController extends Controller
 
                 $payment->update([
                     'status' => 'completed',
-                    'payment_method' =>
-                        $intent->payment_method_types[0] ?? 'card',
+                    'payment_method' => $intent->payment_method_types[0] ?? 'card',
                 ]);
 
                 $expireDate = now()->addDays($package->duration_days);
@@ -75,6 +77,20 @@ class StripeWebhookController extends Controller
                     'vip_expires_at' => $expireDate,
                 ]);
             });
+
+            $invoiceNumber = GenerateNumber::generate('INV', Invoice::class);
+
+            Invoice::create([
+                'user_id' => $user->id,
+                'payment_id' => $payment->id,
+                'package_id' => $package->id,
+                'invoice_number' => $invoiceNumber,
+                'invoice_date' => now(),
+                'description' => $package->description,
+                'total_amount' => $package->price,
+                'paid_amount' => $package->price,
+                'remaining_amount' => 0
+            ]);
         }
 
         if ($event->type === 'payment_intent.payment_failed') {
@@ -88,6 +104,18 @@ class StripeWebhookController extends Controller
                 'status' => 'failed',
             ]);
         }
+
+        $admins = User::role('admin')->first();
+
+        $admins->notify(new UserNotification([
+            'type' => 'admin',
+            'user' => [
+                'id' => $user->id,
+                'fname' => $user->fname,
+                'lname' => $user->lname,
+                'photo' => $user->photo
+            ],
+        ], 'Payment purchased by '.$user->fname.' '.$user->lname));
 
         return response()->json(['received' => true]);
     }

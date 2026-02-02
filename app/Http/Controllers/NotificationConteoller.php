@@ -402,4 +402,40 @@ class NotificationConteoller extends Controller
             'Declined connection notifications'
         );
     }
+
+     public function adminNotifications()
+    {
+        $user = User::role('admin')->first();
+
+        $notifications = $user->notifications()
+        ->where('data->data->type', 'admin')
+        ->latest()
+        ->get();
+
+        $unreadCount = $user->unreadNotifications()
+            ->where('data->data->type', 'admin')
+            ->count();
+
+        $data = $notifications->map(function ($notification) {
+            return [
+                'notification_id' => $notification->id,
+                'message' => $notification->data['message'] ?? null,
+                'user' => $notification->data['data']['user'] ?? null,
+                'created_at' => $notification->created_at,
+                'read_at' => $notification->read_at,
+            ];
+        });
+
+        $user->unreadNotifications()
+            ->where('data->data->type', 'admin')
+            ->update(['read_at' => now()]);
+
+        return $this->successResponse(
+            [
+                'count' => $unreadCount,
+                'notifications' => $data,
+            ],
+            'Declined connection notifications'
+        );
+    }
 }

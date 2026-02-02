@@ -10,6 +10,7 @@ use App\Models\LookingFor;
 use App\Models\Package;
 use App\Models\Profile;
 use App\Models\User;
+use App\Notifications\UserNotification;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -192,16 +193,26 @@ class AuthenticationController extends Controller
             );
         });
 
-        $user = array_merge(
+        $data = array_merge(
             $user->toArray(),
             $profile->toArray(),
             $lookingFor->toArray()
         );
 
-        $admin = User::where('role', 'admin')->first();
+        $admins = User::role('admin')->first();
+
+        $admins->notify(new UserNotification([
+            'type' => 'admin',
+            'user' => [
+                'id' => $user->id,
+                'fname' => $user->fname,
+                'lname' => $user->lname,
+                'photo' => $user->photo
+            ],
+        ], "New user registered"));
 
         return $this->successResponse(
-            $user,
+            $data,
             'Registration successful',
         );
     }

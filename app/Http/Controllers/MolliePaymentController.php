@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\GenerateNumber;
+use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\UserNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -130,7 +133,33 @@ class MolliePaymentController extends Controller
                     'vip_expires_at' => $expireDate,
                 ]);
             });
+
+            $invoiceNumber = GenerateNumber::generate('INV', Invoice::class);
+
+            Invoice::create([
+                'user_id' => $user->id,
+                'payment_id' => $dbPayment->id,
+                'package_id' => $package->id,
+                'invoice_number' => $invoiceNumber,
+                'invoice_date' => now(),
+                'description' => $package->description,
+                'total_amount' => $package->price,
+                'paid_amount' => $package->price,
+                'remaining_amount' => 0
+            ]);
         }
+
+         $admins = User::role('admin')->first();
+
+        $admins->notify(new UserNotification([
+            'type' => 'admin',
+            'user' => [
+                'id' => $user->id,
+                'fname' => $user->fname,
+                'lname' => $user->lname,
+                'photo' => $user->photo
+            ],
+        ], "Package {$package->name} has been purchased by {$user->fname} {$user->lname}."));
 
         return response()->json(['received' => true]);
     }

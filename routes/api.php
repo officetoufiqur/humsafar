@@ -172,7 +172,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard/best-selling', 'bestSelling');
         Route::get('/dashboard/new-users', 'newUsers');
         Route::get('/dashboard/performance', 'performance');
-        Route::get('/dashboard/user-stats', 'userStats');
         Route::get('/dashboard/matching-satisfaction', 'matchingSatisfaction');
     });
 
@@ -217,6 +216,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/accept/{id}', 'userAccept');
         Route::get('/user/notifications/trash', 'getDeclinedNotifications');
         Route::post('/user/decline/{id}', 'userDecline');
+        Route::get('/admin/notifications', 'adminNotifications');
     });
 
     Route::controller(ChatSettingController::class)->group(function () {
@@ -224,7 +224,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/chat/setting/update', 'update');
     });
 
-    Route::post('/stripe/checkout',
+    Route::post(
+        '/stripe/checkout',
         [StripePaymentController::class, 'createPaymentIntent']
     );
 
@@ -233,13 +234,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payment/{id}', 'view');
     });
 
-    Route::controller(CallController::class)->group(function () {
-        Route::post('/call/start', 'start');
-        Route::post('/call/{call}/accept', 'accept');
-        Route::post('/call/{call}/reject', 'reject');
-        Route::post('/call/{call}/signal', 'signal');
-        Route::post('/call/{call}/end', 'end');
-    });
+    Route::post('/calls/start', [CallController::class, 'start']);
+    Route::post('/calls/signal', [CallController::class, 'signal']);
 
     Route::controller(MolliePaymentController::class)->group(function () {
         Route::post('/mollie/pay', 'create');
@@ -255,7 +251,8 @@ Route::controller(WorkController::class)->group(function () {
     Route::get('/works', 'index');
 });
 
-Route::post('/stripe/webhook',
+Route::post(
+    '/stripe/webhook',
     [StripeWebhookController::class, 'handle']
 );
 

@@ -97,7 +97,7 @@ class BackendDashboardController extends Controller
         // ---- Yearly Trend ----
         $thisYear = User::whereYear('created_at', now()->year)->count();
         $lastYear = User::whereYear('created_at', now()->subYear()->year)->count();
-
+// return [$thisYear, $lastYear];
         $growthPercent = $lastYear > 0
             ? round((($thisYear - $lastYear) / $lastYear) * 100, 1)
             : 0;
