@@ -20,7 +20,8 @@ class WebRtcSignalEvent implements ShouldBroadcastNow
         public int $from,
         public int $to,
         public string $type,
-        public array $payload
+        public array $payload,
+        public object $caller_data,
     ) {
     }
 

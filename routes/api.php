@@ -1,36 +1,40 @@
 <?php
 
-use App\Http\Controllers\AdvanceSearchController;
-use App\Http\Controllers\Api\ChatController;
-use App\Http\Controllers\Auth\AdminAuthenticationController;
-use App\Http\Controllers\Auth\AuthenticationController;
-use App\Http\Controllers\BackendDashboardController;
-use App\Http\Controllers\BannerController;
-use App\Http\Controllers\BlogController;
-use App\Http\Controllers\CallController;
-use App\Http\Controllers\ChatSettingController;
-use App\Http\Controllers\ComplaintController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FaqCategoryController;
-use App\Http\Controllers\FaqController;
-use App\Http\Controllers\FrontendSettingController;
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\MemberController;
-use App\Http\Controllers\MolliePaymentController;
-use App\Http\Controllers\MyProfileController;
-use App\Http\Controllers\NotificationConteoller;
-use App\Http\Controllers\PackageController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProfileAttributeController;
-use App\Http\Controllers\ProfileVisitController;
-use App\Http\Controllers\RolePermissionController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\StripePaymentController;
-use App\Http\Controllers\StripeWebhookController;
-use App\Http\Controllers\TicketController;
-use App\Http\Controllers\WorkController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CallController;
+use App\Http\Controllers\WorkController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MyProfileController;
+use App\Http\Controllers\ChatSettingController;
+use App\Http\Controllers\FaqCategoryController;
+use App\Http\Controllers\IncomeReportController;
+use App\Http\Controllers\MemberReportController;
+use App\Http\Controllers\NotificationConteoller;
+use App\Http\Controllers\ProfileVisitController;
+use App\Http\Controllers\AdvanceSearchController;
+use App\Http\Controllers\MolliePaymentController;
+use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\AnalyticsReportController;
+use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\FrontendSettingController;
+use App\Http\Controllers\BackendDashboardController;
+use App\Http\Controllers\ProfileAttributeController;
+use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\Auth\AdminAuthenticationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -244,6 +248,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/mollie/success', 'success');
         Route::get('/mollie/cancel', 'cancel');
     });
+
+    Route::get('/financial-report', [FinancialReportController::class, 'index']);
+    Route::get('/income-report', [IncomeReportController::class, 'index']);
+    Route::get('/member-report', [MemberReportController::class, 'index']);
+    Route::get('/analytics-report', [AnalyticsReportController::class, 'index']);
 
 });
 
