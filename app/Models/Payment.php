@@ -29,4 +29,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Package::class);
     }
+
+    public function invoices()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

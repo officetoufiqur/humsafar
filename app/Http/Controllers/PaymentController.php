@@ -43,6 +43,7 @@ class PaymentController extends Controller
         $payment = Payment::with([
             'user:id,fname,lname,photo,display_name,email',
             'user.profile:id,user_id,location',
+            'invoices'
         ])->findOrFail($id);
 
         return $this->successResponse($payment, 'Payment details');
