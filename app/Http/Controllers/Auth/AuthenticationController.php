@@ -244,6 +244,9 @@ class AuthenticationController extends Controller
         $user = $request->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $user->last_login_at = now();
+        $user->save();
+
         $data = [
             'token' => $token,
             'user' => $user,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileUpload;
+use App\Models\DeleteUser;
 use App\Models\LookingFor;
 use App\Models\Profile;
 use App\Models\User;
@@ -258,6 +259,10 @@ class MyProfileController extends Controller
         $user = Auth::user();
 
         $user->delete();
+
+        DeleteUser::create([
+            'user_id' => $user->id
+        ]);
 
         return $this->successResponse(
             null,

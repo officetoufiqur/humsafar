@@ -27,6 +27,7 @@ use App\Http\Controllers\AdvanceSearchController;
 use App\Http\Controllers\MolliePaymentController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\DetailedReportController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\AnalyticsReportController;
 use App\Http\Controllers\FinancialReportController;
@@ -221,6 +222,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/notifications/trash', 'getDeclinedNotifications');
         Route::post('/user/decline/{id}', 'userDecline');
         Route::get('/admin/notifications', 'adminNotifications');
+        Route::get('/admin/notifications/read/{id?}', 'adminNotificationsRead');
     });
 
     Route::controller(ChatSettingController::class)->group(function () {
@@ -253,6 +255,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/income-report', [IncomeReportController::class, 'index']);
     Route::get('/member-report', [MemberReportController::class, 'index']);
     Route::get('/analytics-report', [AnalyticsReportController::class, 'index']);
+    Route::get('/detailed-report', [DetailedReportController::class, 'index']);
 
 });
 

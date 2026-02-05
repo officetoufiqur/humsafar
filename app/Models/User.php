@@ -41,6 +41,7 @@ class User extends Authenticatable
         'status',
         'membership_type',
         'vip_expires_at',
+        'last_login_at'
     ];
 
     /**

@@ -403,14 +403,14 @@ class NotificationConteoller extends Controller
         );
     }
 
-     public function adminNotifications()
+    public function adminNotifications()
     {
         $user = User::role('admin')->first();
 
         $notifications = $user->notifications()
-        ->where('data->data->type', 'admin')
-        ->latest()
-        ->get();
+            ->where('data->data->type', 'admin')
+            ->latest()
+            ->get();
 
         $unreadCount = $user->unreadNotifications()
             ->where('data->data->type', 'admin')
@@ -426,10 +426,6 @@ class NotificationConteoller extends Controller
             ];
         });
 
-        $user->unreadNotifications()
-            ->where('data->data->type', 'admin')
-            ->update(['read_at' => now()]);
-
         return $this->successResponse(
             [
                 'count' => $unreadCount,
@@ -437,5 +433,32 @@ class NotificationConteoller extends Controller
             ],
             'Declined connection notifications'
         );
+    }
+
+    public function adminNotificationsRead($id = null)
+    {
+        $user = Auth::user();
+
+        // 🔹 Mark ALL notifications as read
+        if ($id === null) {
+            $user->unreadNotifications()
+                ->where('data->data->type', 'admin')
+                ->update(['read_at' => now()]);
+
+            return $this->successResponse(null, 'All notifications marked as read');
+        }
+
+        // 🔹 Mark SINGLE notification as read
+        $notification = $user->notifications()->where('id', $id)->first();
+
+        if (! $notification) {
+            return $this->errorResponse('Notification not found', 404);
+        }
+
+        if (is_null($notification->read_at)) {
+            $notification->update(['read_at' => now()]);
+        }
+
+        return $this->successResponse(null, 'Notification marked as read');
     }
 }

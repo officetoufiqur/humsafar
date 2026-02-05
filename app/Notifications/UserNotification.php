@@ -18,7 +18,7 @@ class UserNotification extends Notification implements ShouldQueue
     {
         $this->data = $data;
         $this->message = $message;
-    }
+    } 
 
     public function via(object $notifiable): array
     {

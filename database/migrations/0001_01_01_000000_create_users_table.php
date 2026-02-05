@@ -34,6 +34,7 @@ return new class extends Migration
             $table->enum('status',['active','inactive','blocked','unblocked'])->default('active');
             $table->enum('membership_type',['free','vip'])->default('free');
             $table->dateTime('vip_expires_at')->nullable();
+            $table->dateTime('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
