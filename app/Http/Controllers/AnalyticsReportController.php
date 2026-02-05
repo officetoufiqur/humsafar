@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Trait\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnalyticsReportController extends Controller
 {
@@ -61,13 +63,89 @@ class AnalyticsReportController extends Controller
             ? (($thisWeek - $lastWeek) / $lastWeek) * 100
             : ($thisWeek > 0 ? 100 : 0);
 
+        // Date ranges
+        $last30Days = Carbon::now()->subDays(30);
+        $previous30Days = Carbon::now()->subDays(60);
+
+        // Matches
+        $matchesCurrent = DB::table('match_users')
+            ->where('created_at', '>=', $last30Days)
+            ->count();
+
+        $matchesPrevious = DB::table('match_users')
+            ->whereBetween('created_at', [$previous30Days, $last30Days])
+            ->count();
+
+        // Messages
+        $messagesCurrent = DB::table('messages')
+            ->where('created_at', '>=', $last30Days)
+            ->count();
+
+        $messagesPrevious = DB::table('messages')
+            ->whereBetween('created_at', [$previous30Days, $last30Days])
+            ->count();
+
+        $matchesChangePercent = $this->percentChange($matchesPrevious, $matchesCurrent);
+        $messagesChangePercent = $this->percentChange($messagesPrevious, $messagesCurrent);
+
+        $countries = DB::table('profiles')
+            ->select('country', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('country')
+            ->groupBy('country')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        $countriesTotal = $countries->sum('total');
+
+        $topCountries = $countries->map(function ($item) use ($countriesTotal) {
+            return [
+                'name' => $item->country,
+                'percentage' => round(($item->total / $countriesTotal) * 100, 1),
+            ];
+        });
+
+        $cities = DB::table('profiles')
+            ->select('city', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('city')
+            ->groupBy('city')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        $maxCityCount = $cities->max('total');
+
+        $topCities = $cities->map(function ($item) use ($maxCityCount) {
+            return [
+                'name' => $item->city,
+                'count' => $item->total,
+                'percentage' => round(($item->total / $maxCityCount) * 100),
+            ];
+        });
+
+
         $data = [
             'totalUsers' => $totalUsers,
             'growthSinceLastMonth' => round($lastMonthPercentage, 2),
             'newSignups' => $newSignups,
             'weeklyGrowth' => round($weeklyGrowth, 2),
+            'matchesCurrent' => $matchesCurrent,
+            'matchesChangePercent' => round($matchesChangePercent, 2),
+            'messagesCurrent' => $messagesCurrent,
+            'messagesChangePercent' => round($messagesChangePercent, 2),
+            'topCountries' => $topCountries,
+            'topCities' => $topCities,
         ];
 
         return $this->successResponse($data, 'Analytics fetched successfully');
+    }
+
+    private function percentChange($old, $new)
+    {
+        if ($old == 0) {
+            return $new > 0 ? 100 : 0;
+        }
+
+        return round((($new - $old) / $old) * 100, 1);
     }
 }
