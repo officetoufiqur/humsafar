@@ -25,7 +25,9 @@ class DatabaseSeeder extends Seeder
             WorkStepSeeder::class,
             ProfileAttributeSeeder::class,
             FrontendSettingSeeder::class,
-            ChatSettingSeeder::class
+            ChatSettingSeeder::class,
+            SettingSeeder::class,
+            NotificationSettingSeeder::class,
         ]);
     }
 }

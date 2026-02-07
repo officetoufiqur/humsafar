@@ -13,6 +13,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\ComplaintController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\FrontendSettingController;
 use App\Http\Controllers\BackendDashboardController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 
 Route::get('/user', function (Request $request) {
@@ -258,6 +260,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/analytics-report', [AnalyticsReportController::class, 'index']);
     Route::get('/detailed-report', [DetailedReportController::class, 'index']);
     Route::get('/overview-report', [OverviewController::class, 'index']);
+
+    Route::controller(SettingController::class)->group(function () {
+        Route::get('/settings', 'index');
+        Route::post('/settings', 'update');
+    });
+
+    Route::controller(NotificationSettingController::class)->group(function () {
+        Route::get('/notification-settings', 'index');
+        Route::get('/notification-settings/edit', 'edit');
+        Route::post('/notification-settings/{id}', 'update');
+    });
 
 });
 

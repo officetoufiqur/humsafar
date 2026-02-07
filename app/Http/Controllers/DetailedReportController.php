@@ -129,6 +129,8 @@ class DetailedReportController extends Controller
             ->limit(10)
             ->get();
 
+        $country = Profile::select('country')->get();
+
         $data = [
             'daily_logins' => $dailyLogins,
             'growth' => $growthPercentage,
@@ -144,6 +146,7 @@ class DetailedReportController extends Controller
             'religion_monthly' => $religionMonthly,
             'gender_stats' => $genderStats,
             'recent_users' => $recentUsers,
+            'countries' => $country,
         ];
 
         return $this->successResponse($data, 'Dashboard stats retrieved successfully');
