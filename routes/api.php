@@ -14,6 +14,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyProfileController;
@@ -256,6 +257,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/member-report', [MemberReportController::class, 'index']);
     Route::get('/analytics-report', [AnalyticsReportController::class, 'index']);
     Route::get('/detailed-report', [DetailedReportController::class, 'index']);
+    Route::get('/overview-report', [OverviewController::class, 'index']);
 
 });
 
