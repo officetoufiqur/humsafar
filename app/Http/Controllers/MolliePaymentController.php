@@ -20,8 +20,7 @@ class MolliePaymentController extends Controller
     {
         $request->validate([
             'package_id' => 'required|exists:packages,id',
-            'tier' => 'required|string',
-            'redirect_url' => 'required|url',
+            'tier' => 'required|string'
         ]);
 
         $package = Package::findOrFail($request->package_id);
@@ -38,7 +37,7 @@ class MolliePaymentController extends Controller
                 'value' => number_format($package->price, 2, '.', ''),
             ],
             'description' => 'Package: '.$package->name,
-            'redirectUrl' => $request->redirect_url,
+            'redirectUrl' => 'https://example.com/payment-success',
             'webhookUrl' => 'https://nonpluralistic-princeton-subaqueous.ngrok-free.dev/api/mollie/webhook',
             'metadata' => [
                 'package_id' => $package->id,

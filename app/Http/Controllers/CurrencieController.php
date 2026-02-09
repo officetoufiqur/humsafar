@@ -80,11 +80,11 @@ class CurrencieController extends Controller
         $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'symbol_format' => 'required|in:before_amount,after_amount',
-            'decimal_separator' => 'required|in:.,',
+            'decimal_separator' => 'required',
             'decimal_places' => 'required|integer|min:0',
         ]);
 
-        $currencyFormate = CurrencyFormate::where('currency_id', $request->currency_id)->first();
+        $currencyFormate = CurrencyFormate::first();
         if (!$currencyFormate) {
             return $this->errorResponse('Currency format not found', 404);
         }
