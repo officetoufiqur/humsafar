@@ -17,6 +17,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\CurrencieController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\ChatSettingController;
@@ -308,6 +309,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/footer-section-settings', 'store');
         Route::post('/footer-section-settings/{id}', 'update');
         Route::delete('/footer-section-settings/{id}', 'destroy');
+    });
+
+    Route::controller(CurrencieController::class)->group(function () {
+        Route::get('/currencies', 'index');
+        Route::post('/currencies', 'store');
+        Route::post('/currencies/{id}', 'update');
+        Route::delete('/currencies/{id}', 'destroy');
+        Route::post('/currencies-formate', 'updateFormate');
     });
 
 });

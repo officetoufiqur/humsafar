@@ -101,7 +101,7 @@ class FrontendSettingController extends Controller
 
             $existingData = is_array($frontendSetting->content)
                 ? $frontendSetting->content
-                : json_decode($frontendSetting->content, true);
+                : $frontendSetting->content;
 
             $bannerImage = $existingData['banner_image'] ?? null;
             $datingImage1 = $existingData['dating_image1'] ?? null;
@@ -205,7 +205,7 @@ class FrontendSettingController extends Controller
             $frontendSetting->save();
 
             return $this->successResponse($frontendSetting, 'Contact Settings Updated Successfully');
-        } elseif ($slug === 'how-works') {
+        } elseif ($slug === 'how-work') {
             $request->validate([
                 'work_title' => 'nullable|string',
                 'title' => 'nullable|string',
