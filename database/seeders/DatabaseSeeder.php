@@ -28,6 +28,11 @@ class DatabaseSeeder extends Seeder
             ChatSettingSeeder::class,
             SettingSeeder::class,
             NotificationSettingSeeder::class,
+            SocialSettingSeeder::class,
+            PaymentSettingSeeder::class,
+            SmtpSettingSeeder::class,
+            FooterSettingSeeder::class,
+            UserDashboardSettingSeeder::class,
         ]);
     }
 }

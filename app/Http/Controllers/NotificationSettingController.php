@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MailCount;
+use App\Models\NotificationSetting;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
-use App\Models\NotificationSetting;
 
 class NotificationSettingController extends Controller
 {
@@ -12,15 +13,32 @@ class NotificationSettingController extends Controller
 
     public function index()
     {
+        $email_this_month = MailCount::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('email_count');
+
+        $password_this_month = MailCount::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('password_count');
+
+        $order_this_month = MailCount::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('order_count');
+
         $notifications = NotificationSetting::where('language', 'en')->get();
 
         if ($notifications->isEmpty()) {
             return $this->errorResponse('No notification templates found', 404);
         }
 
-        return $this->successResponse($notifications, 'Notifications retrieved successfully');
+        return $this->successResponse([
+            'email_count' => $email_this_month,
+            'password_count' => $password_this_month,
+            'order_count' => $order_this_month,
+            'notifications' => $notifications
+        ], 'Notifications retrieved successfully');
     }
-    
+
     public function edit(Request $request)
     {
         $request->validate([
@@ -32,26 +50,36 @@ class NotificationSettingController extends Controller
             ->where('language', $request->language)
             ->first();
 
-        if (!$notification) {
+        if (! $notification) {
             return $this->errorResponse('Template not found', 404);
         }
 
         return $this->successResponse($notification, 'Notification template retrieved successfully');
     }
 
-    public function update(Request $request, $id)
+    public function templateName($id)
+    {
+        $notification = NotificationSetting::where('id', $id)->select('id', 'template_name')->first();
+
+        if (! $notification) {
+            return $this->errorResponse('Template not found', 404);
+        }
+
+        return $this->successResponse($notification, 'Notification template retrieved successfully');
+    }
+
+    public function update(Request $request)
     {
         $request->validate([
             'template_name' => 'required|string',
             'language' => 'required|string|max:5',
         ]);
 
-        $notification = NotificationSetting::where('id', $id)
-            ->where('template_name', $request->template_name)
+        $notification = NotificationSetting::where('template_name', $request->template_name)
             ->where('language', $request->language)
             ->first();
 
-        if (!$notification) {
+        if (! $notification) {
             return $this->errorResponse('Template not found', 404);
         }
 

@@ -21,15 +21,19 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\ChatSettingController;
 use App\Http\Controllers\FaqCategoryController;
+use App\Http\Controllers\SmtpSettingController;
 use App\Http\Controllers\IncomeReportController;
 use App\Http\Controllers\MemberReportController;
 use App\Http\Controllers\NotificationConteoller;
 use App\Http\Controllers\ProfileVisitController;
 use App\Http\Controllers\AdvanceSearchController;
+use App\Http\Controllers\FooterSettingController;
 use App\Http\Controllers\MolliePaymentController;
+use App\Http\Controllers\SocialSettingController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\DetailedReportController;
+use App\Http\Controllers\PaymentSettingController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\AnalyticsReportController;
 use App\Http\Controllers\FinancialReportController;
@@ -38,6 +42,7 @@ use App\Http\Controllers\BackendDashboardController;
 use App\Http\Controllers\ProfileAttributeController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\NotificationSettingController;
+use App\Http\Controllers\FooterSectionSettingController;
 use App\Http\Controllers\Auth\AdminAuthenticationController;
 
 Route::get('/user', function (Request $request) {
@@ -268,8 +273,41 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(NotificationSettingController::class)->group(function () {
         Route::get('/notification-settings', 'index');
+        Route::get('/notification-settings/template/{id}', 'templateName');
         Route::get('/notification-settings/edit', 'edit');
-        Route::post('/notification-settings/{id}', 'update');
+        Route::post('/notification-settings', 'update');
+    });
+
+    Route::controller(SocialSettingController::class)->group(function () {
+        Route::get('/social-settings', 'index');
+        Route::post('/social-settings', 'update');
+        Route::post('/social-settings/recaptcha', 'updateRecaptcha');
+    });
+
+    Route::controller(PaymentSettingController::class)->group(function () {
+        Route::get('/payment-settings', 'index');
+        Route::post('/payment-settings', 'update');
+    });
+
+    Route::controller(SmtpSettingController::class)->group(function () {
+        Route::get('/smtp-settings', 'index');
+        Route::post('/smtp-settings', 'update');
+        // Route::post('/smtp-settings/test-email', 'testEmail');
+    });
+
+    Route::controller(FooterSettingController::class)->group(function () {
+        Route::get('/footer-settings', 'index');
+        Route::post('/footer-settings', 'update');
+
+        Route::get('/user-dashboard-settings', 'userDashboardSettings');
+        Route::post('/user-dashboard-settings', 'updateUserDashboardSettings');
+    });
+
+    Route::controller(FooterSectionSettingController::class)->group(function () {
+        Route::get('/footer-section-settings', 'index');
+        Route::post('/footer-section-settings', 'store');
+        Route::post('/footer-section-settings/{id}', 'update');
+        Route::delete('/footer-section-settings/{id}', 'destroy');
     });
 
 });
