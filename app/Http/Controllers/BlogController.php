@@ -17,7 +17,7 @@ class BlogController extends Controller
     {
         $categories = BlogCategory::withCount('blogs')->get();
 
-        if (!$categories) {
+        if (! $categories) {
             return $this->errorResponse('Category not found', 404);
         }
 
@@ -32,7 +32,7 @@ class BlogController extends Controller
 
         $slug = str_replace(' ', '-', strtolower($request->name));
 
-        $category = new BlogCategory();
+        $category = new BlogCategory;
         $category->name = $request->name;
         $category->slug = $slug;
         $category->status = true;
@@ -45,14 +45,13 @@ class BlogController extends Controller
     {
         $category = BlogCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->errorResponse('Category not found', 404);
         }
 
         return $this->successResponse($category, 'Category fetched successfully');
     }
 
-    
     public function categoryUpdate(Request $request, $id)
     {
         $request->validate([
@@ -61,7 +60,7 @@ class BlogController extends Controller
 
         $category = BlogCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->errorResponse('Category not found', 404);
         }
 
@@ -78,7 +77,7 @@ class BlogController extends Controller
     {
         $category = BlogCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->errorResponse('Category not found', 404);
         }
 
@@ -90,6 +89,7 @@ class BlogController extends Controller
     public function getBlogs()
     {
         $blog = Blog::with('seo')->latest()->get();
+
         return $this->successResponse($blog, 'Blogs fetched successfully');
     }
 
@@ -104,19 +104,20 @@ class BlogController extends Controller
             'active' => $active,
             'inactive' => $inactive,
         ];
+
         return $this->successResponse($data, 'Blogs fetched successfully');
     }
 
     public function blogs(Request $request)
     {
         $request->validate([
-           'title' => 'required|string|max:255',
-           'slug' => 'required|string|max:255',
-           'description' => 'required|string',
-           'category_id' => 'required|exists:blog_categories,id',
-           'short_description' => 'required|string',
-           'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
-           'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:blog_categories,id',
+            'short_description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
         ]);
 
         $metaFile = null;
@@ -128,9 +129,9 @@ class BlogController extends Controller
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
             'meta_keywords' => $request->meta_keywords,
-            'meta_image' => $metaFile
+            'meta_image' => $metaFile,
         ]);
-        
+
         $file = null;
         if ($request->hasFile('image')) {
             $file = FileUpload::storeFile($request->file('image'), 'uploads/blogs');
@@ -138,7 +139,7 @@ class BlogController extends Controller
 
         $category = BlogCategory::find($request->category_id);
 
-        $blog = new Blog();
+        $blog = new Blog;
         $blog->seo_id = $seo->id;
         $blog->title = $request->title;
         $blog->category_id = $category->id;
@@ -157,7 +158,7 @@ class BlogController extends Controller
     {
         $blog = Blog::with('seo')->find($id);
 
-        if (!$blog) {
+        if (! $blog) {
             return $this->errorResponse('Blog not found', 404);
         }
 
@@ -167,18 +168,18 @@ class BlogController extends Controller
     public function blogsUpdate(Request $request, $id)
     {
         $request->validate([
-           'title' => 'required|string|max:255',
-           'slug' => 'required|string|max:255',
-           'description' => 'required|string',
-           'category_id' => 'required|exists:blog_categories,id',
-           'short_description' => 'required|string',
-           'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
-           'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:blog_categories,id',
+            'short_description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
+            'meta_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
         ]);
 
         $blog = Blog::find($id);
 
-        if (!$blog) {
+        if (! $blog) {
             return $this->errorResponse('Blog not found', 404);
         }
 
@@ -193,7 +194,7 @@ class BlogController extends Controller
         $seo->meta_description = $request->meta_description;
         $seo->meta_keywords = $request->meta_keywords;
         $seo->save();
-        
+
         if ($request->hasFile('image')) {
             $file = FileUpload::storeFile($request->file('image'), 'uploads/blogs');
             $blog->image = $file;
@@ -216,7 +217,7 @@ class BlogController extends Controller
     {
         $blog = Blog::find($id);
 
-        if (!$blog) {
+        if (! $blog) {
             return $this->errorResponse('Blog not found', 404);
         }
 
@@ -227,7 +228,18 @@ class BlogController extends Controller
 
     public function blogDetails($id)
     {
-        $blog = Blog::with('seo')->find($id);
-        return $this->successResponse($blog, 'Blog fetched successfully');
+        $blog = Blog::find($id);
+
+        if (! $blog) {
+            return $this->errorResponse('Blog not found', 404);
+        }
+        $reaturedPosts = Blog::where('id', '!=', $id)->latest()->take(5)->get();
+        $category = BlogCategory::select('id', 'name')->get();
+
+        return $this->successResponse([
+            'blog' => $blog,
+            'category' => $category,
+            'reaturedPosts' => $reaturedPosts,
+        ], 'Blog fetched successfully');
     }
 }

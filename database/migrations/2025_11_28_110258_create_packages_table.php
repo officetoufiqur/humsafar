@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->json('features');
             $table->boolean('status')->default(false);
+            $table->string('symbol')->default('$');
+            $table->string('currency')->default('USD');
             $table->timestamps();
         });
     }

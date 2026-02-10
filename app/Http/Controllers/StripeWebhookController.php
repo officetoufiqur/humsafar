@@ -30,39 +30,31 @@ class StripeWebhookController extends Controller
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
-        if ($event->type === 'payment_intent.succeeded') {
+        if ($event->type === 'checkout.session.completed') {
 
-            $intent = $event->data->object;
+            $session = $event->data->object;
 
             $payment = Payment::where(
-                'stripe_payment_intent_id',
-                $intent->id
+                'stripe_session_id',
+                $session->id
             )->first();
 
-            if (! $payment) {
-                return response()->json(['error' => 'Payment not found'], 404);
-            }
-
-            if ($payment->status === 'completed') {
+            if (! $payment || $payment->status === 'completed') {
                 return response()->json(['received' => true]);
             }
 
-            if ((int) $intent->amount !== (int) $payment->amount) {
-                return response()->json(['error' => 'Amount mismatch'], 400);
-            }
-
-            $user = User::find($intent->metadata->user_id ?? null);
-            $package = Package::find($intent->metadata->package_id ?? null);
+            $user = User::find($session->metadata->user_id);
+            $package = Package::find($session->metadata->package_id);
 
             if (! $user || ! $package) {
                 return response()->json(['error' => 'Invalid metadata'], 400);
             }
 
-            DB::transaction(function () use ($payment, $user, $package, $intent) {
+            DB::transaction(function () use ($payment, $user, $package) {
 
                 $payment->update([
                     'status' => 'completed',
-                    'payment_method' => $intent->payment_method_types[0] ?? 'card',
+                    'payment_method' => 'stripe',
                 ]);
 
                 $expireDate = now()->addDays($package->duration_days);
@@ -76,46 +68,22 @@ class StripeWebhookController extends Controller
                     'membership_type' => 'vip',
                     'vip_expires_at' => $expireDate,
                 ]);
+
+                $invoiceNumber = GenerateNumber::generate('INV', Invoice::class);
+
+                Invoice::create([
+                    'user_id' => $user->id,
+                    'payment_id' => $payment->id,
+                    'package_id' => $package->id,
+                    'invoice_number' => $invoiceNumber,
+                    'invoice_date' => now(),
+                    'description' => $package->description,
+                    'total_amount' => $package->price,
+                    'paid_amount' => $package->price,
+                    'remaining_amount' => 0
+                ]);
             });
-
-            $invoiceNumber = GenerateNumber::generate('INV', Invoice::class);
-
-            Invoice::create([
-                'user_id' => $user->id,
-                'payment_id' => $payment->id,
-                'package_id' => $package->id,
-                'invoice_number' => $invoiceNumber,
-                'invoice_date' => now(),
-                'description' => $package->description,
-                'total_amount' => $package->price,
-                'paid_amount' => $package->price,
-                'remaining_amount' => 0
-            ]);
         }
-
-        if ($event->type === 'payment_intent.payment_failed') {
-
-            $intent = $event->data->object;
-
-            Payment::where(
-                'stripe_payment_intent_id',
-                $intent->id
-            )->update([
-                'status' => 'failed',
-            ]);
-        }
-
-        $admins = User::role('admin')->first();
-
-        $admins->notify(new UserNotification([
-            'type' => 'admin',
-            'user' => [
-                'id' => $user->id,
-                'fname' => $user->fname,
-                'lname' => $user->lname,
-                'photo' => $user->photo
-            ],
-        ], 'Payment purchased by '.$user->fname.' '.$user->lname));
 
         return response()->json(['received' => true]);
     }

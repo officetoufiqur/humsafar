@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('package_id')->constrained('packages')->cascadeOnDelete();
-            $table->string('stripe_payment_intent_id')->nullable()->unique();
+            $table->string('mollie_payment_id')->nullable()->unique();
+            $table->string('stripe_session_id')->nullable()->unique();
             $table->string('tier');
             $table->string('method');
-            $table->string('amount');
+            $table->decimal('amount', 10, 2);
             $table->string('currency')->default('usd');
             $table->enum('status',['pending','completed','failed'])->default('pending');
             $table->timestamps();

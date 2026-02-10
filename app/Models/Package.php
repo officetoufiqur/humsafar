@@ -17,6 +17,8 @@ class Package extends Model
         'image',
         'features',
         'status',
+        'symbol',
+        'currency',
     ];
 
     protected $casts = [

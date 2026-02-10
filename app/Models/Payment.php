@@ -12,7 +12,8 @@ class Payment extends Model
     protected $fillable = [
         'user_id',
         'package_id',
-        'stripe_payment_intent_id',
+        'mollie_payment_id',
+        'stripe_session_id',
         'tier',
         'method',
         'amount',

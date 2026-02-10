@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileUpload;
+use App\Models\Currencie;
+use App\Models\Language;
+use App\Models\Package;
 use App\Models\Setting;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
@@ -11,20 +14,22 @@ class SettingController extends Controller
 {
     use ApiResponse;
 
-    public function index(){
+    public function index()
+    {
         $setting = Setting::first();
 
-        if (!$setting) {
+        if (! $setting) {
             return $this->errorResponse('Settings not found', 404);
         }
 
         return $this->successResponse($setting, 'Settings retrieved successfully');
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
         $setting = Setting::first();
 
-        if (!$setting) {
+        if (! $setting) {
             return $this->errorResponse('Settings not found', 404);
         }
 
@@ -62,6 +67,25 @@ class SettingController extends Controller
 
         $setting->save();
 
+        $currency = Currencie::where('symbol', $request->default_currency)->first();
+
+        Package::query()->update([
+            'symbol' => $currency->symbol,
+            'currency' => $currency->code,
+        ]);
+
         return $this->successResponse($setting, 'Settings updated successfully');
+    }
+
+    public function currencyData()
+    {
+        $currencies = Currencie::get();
+
+        $languages = Language::select('code', 'name')->get();
+
+        return $this->successResponse([
+            'currencies' => $currencies,
+            'languages' => $languages,
+        ], 'Currencies and languages retrieved successfully');
     }
 }

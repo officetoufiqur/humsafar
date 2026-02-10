@@ -4,12 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FileUpload;
 use App\Models\Package;
+use App\Models\PaymentSetting;
 use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
     use ApiResponse;
+
+    public function packagesList()
+    {
+        $setting = PaymentSetting::first();
+
+        return response()->json([
+            'mollie' => $setting?->mollie_status ?? false,
+            'stripe' => $setting?->stripe_status ?? false,
+        ]);
+    }
 
     public function getPackages(Request $request)
     {
@@ -74,19 +85,18 @@ class PackageController extends Controller
     {
         $package = Package::find($id);
 
-        if (!$package) {
+        if (! $package) {
             return $this->errorResponse('Package not found', 404);
         }
 
         return $this->successResponse($package, 'Package fetched successfully');
     }
 
-    
     public function packagesUpdate(Request $request, $id)
     {
         $package = Package::find($id);
 
-        if (!$package) {
+        if (! $package) {
             return $this->errorResponse('Package not found', 404);
         }
 
@@ -97,7 +107,7 @@ class PackageController extends Controller
             'description' => 'sometimes|required|string',
             'features' => 'sometimes|required|array',
             'features*' => 'sometimes|required|array',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif,svg|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -125,14 +135,15 @@ class PackageController extends Controller
     {
         $package = Package::find($id);
 
-        if (!$package) {
+        if (! $package) {
             return $this->errorResponse('Package not found', 404);
         }
 
-        $package->status = !$package->status;
+        $package->status = ! $package->status;
         $package->save();
-        
+
         $status = $package->status ? 'activated' : 'deactivated';
+
         return $this->successResponse($package, "Package {$status} successfully");
     }
 }

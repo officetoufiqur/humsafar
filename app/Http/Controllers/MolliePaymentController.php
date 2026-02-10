@@ -20,7 +20,6 @@ class MolliePaymentController extends Controller
     {
         $request->validate([
             'package_id' => 'required|exists:packages,id',
-            'tier' => 'required|string'
         ]);
 
         $package = Package::findOrFail($request->package_id);
@@ -33,7 +32,7 @@ class MolliePaymentController extends Controller
 
         $molliePayment = Mollie::api()->payments->create([
             'amount' => [
-                'currency' => 'USD',
+                'currency' => strtoupper($package->currency),
                 'value' => number_format($package->price, 2, '.', ''),
             ],
             'description' => 'Package: '.$package->name,
@@ -48,11 +47,11 @@ class MolliePaymentController extends Controller
         Payment::create([
             'user_id' => Auth::id(),
             'package_id' => $package->id,
-            'stripe_payment_intent_id' => $molliePayment->id,
-            'tier' => $request->tier,
+            'mollie_payment_id' => $molliePayment->id,
+            'tier' => $package->name,
             'method' => 'mollie',
             'amount' => $package->price,
-            'currency' => 'usd',
+            'currency' => $package->currency,
             'status' => 'pending',
         ]);
 
@@ -68,10 +67,12 @@ class MolliePaymentController extends Controller
             return response()->json(['error' => 'Invalid payload'], 400);
         }
 
-        $molliePayment = Mollie::api()
-            ->payments()
-            ->get($request->id);
-
+        try {
+            $molliePayment = Mollie::api()->payments()->get($request->id);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid Mollie payment'], 400);
+        }
+        
         $dbPayment = Payment::where(
             'mollie_payment_id',
             $molliePayment->id
@@ -144,21 +145,22 @@ class MolliePaymentController extends Controller
                 'description' => $package->description,
                 'total_amount' => $package->price,
                 'paid_amount' => $package->price,
-                'remaining_amount' => 0
+                'remaining_amount' => 0,
             ]);
+
+            $admins = User::role('admin')->first();
+
+            $admins->notify(new UserNotification([
+                'type' => 'admin',
+                'user' => [
+                    'id' => $user->id,
+                    'fname' => $user->fname,
+                    'lname' => $user->lname,
+                    'photo' => $user->photo,
+                ],
+            ], "Package {$package->name} has been purchased by {$user->fname} {$user->lname}."));
+
         }
-
-         $admins = User::role('admin')->first();
-
-        $admins->notify(new UserNotification([
-            'type' => 'admin',
-            'user' => [
-                'id' => $user->id,
-                'fname' => $user->fname,
-                'lname' => $user->lname,
-                'photo' => $user->photo
-            ],
-        ], "Package {$package->name} has been purchased by {$user->fname} {$user->lname}."));
 
         return response()->json(['received' => true]);
     }

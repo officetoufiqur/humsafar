@@ -15,6 +15,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\CurrencieController;
@@ -80,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(PackageController::class)->group(function () {
+        Route::get('/packages-list', 'packagesList');
         Route::get('/packages', 'getPackages');
         Route::post('/packages', 'packages');
         Route::get('/packages/{id}', 'packagesEdit');
@@ -241,7 +243,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post(
         '/stripe/checkout',
-        [StripePaymentController::class, 'createPaymentIntent']
+        [StripePaymentController::class, 'checkout']
     );
 
     Route::controller(PaymentController::class)->group(function () {
@@ -270,6 +272,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(SettingController::class)->group(function () {
         Route::get('/settings', 'index');
         Route::post('/settings', 'update');
+        Route::get('/settings/currency', 'currencyData');
     });
 
     Route::controller(NotificationSettingController::class)->group(function () {
@@ -317,6 +320,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/currencies/{id}', 'update');
         Route::delete('/currencies/{id}', 'destroy');
         Route::post('/currencies-formate', 'updateFormate');
+    });
+
+    Route::controller(LanguageController::class)->group(function () {
+        Route::get('/languages', 'index');
+        Route::post('/languages', 'store');
+        Route::get('/languages/{code}', 'edit');
+        Route::post('/languages/translate', 'update');
+        Route::delete('/languages/{id}', 'destroy');
+        Route::get('/translations/{lang}', 'translations');
     });
 
 });
